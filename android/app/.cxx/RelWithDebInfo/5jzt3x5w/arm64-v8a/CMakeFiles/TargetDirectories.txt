@@ -1,0 +1,2 @@
+/Users/codezenius/Documents/Projects/new_mac/cz_flutter_bookfast_customer/android/app/.cxx/RelWithDebInfo/5jzt3x5w/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/codezenius/Documents/Projects/new_mac/cz_flutter_bookfast_customer/android/app/.cxx/RelWithDebInfo/5jzt3x5w/arm64-v8a/CMakeFiles/rebuild_cache.dir

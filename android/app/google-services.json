@@ -1,0 +1,160 @@
+{
+  "project_info": {
+    "project_number": "4775156353",
+    "firebase_url": "https://bookfast-cabs-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "bookfast-cabs",
+    "storage_bucket": "bookfast-cabs.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:4775156353:android:8efad4fa1324aabc914b80",
+        "android_client_info": {
+          "package_name": "com.besttruckparking"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "4775156353-v65um3gbt0b8ls7rsnf9q6uocbk6h84p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwqNQQJS8rugWxg0fd_NtQckYZf5ZwzoA"
+        },
+        {
+          "current_key": "AIzaSyA7zh8ogzWlvH3c4eyuPEE42i9PVsI_vio"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "4775156353-v65um3gbt0b8ls7rsnf9q6uocbk6h84p.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "4775156353-8sp26pvcbas99bm1a4fbcdke1fjv2351.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.bookfast.driver"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:4775156353:android:d288758a64c3d823914b80",
+        "android_client_info": {
+          "package_name": "com.bookfast"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "4775156353-nb2ui2jfbugohcbvbm4fejvfdti3gck5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bookfast",
+            "certificate_hash": "d45d3b49f21c5635a12ad19c7da29b93d74384af"
+          }
+        },
+        {
+          "client_id": "4775156353-q2vido1a7r8nr4pc2fn83h8fsbo6dutl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bookfast",
+            "certificate_hash": "d8919e959ac2a2cf9ca78b5fedf52b665c6a9ec1"
+          }
+        },
+        {
+          "client_id": "4775156353-v65um3gbt0b8ls7rsnf9q6uocbk6h84p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwqNQQJS8rugWxg0fd_NtQckYZf5ZwzoA"
+        },
+        {
+          "current_key": "AIzaSyA7zh8ogzWlvH3c4eyuPEE42i9PVsI_vio"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "4775156353-v65um3gbt0b8ls7rsnf9q6uocbk6h84p.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "4775156353-8sp26pvcbas99bm1a4fbcdke1fjv2351.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.bookfast.driver"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:4775156353:android:44d17ebe0656dfc0914b80",
+        "android_client_info": {
+          "package_name": "com.bookfast.ride"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "4775156353-h6g47790atsnqmjsfi8hflkdhq003871.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bookfast.ride",
+            "certificate_hash": "d45d3b49f21c5635a12ad19c7da29b93d74384af"
+          }
+        },
+        {
+          "client_id": "4775156353-qj52e13vu700nbau7mo26amlrmaflgai.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bookfast.ride",
+            "certificate_hash": "d8919e959ac2a2cf9ca78b5fedf52b665c6a9ec1"
+          }
+        },
+        {
+          "client_id": "4775156353-v65um3gbt0b8ls7rsnf9q6uocbk6h84p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwqNQQJS8rugWxg0fd_NtQckYZf5ZwzoA"
+        },
+        {
+          "current_key": "AIzaSyA7zh8ogzWlvH3c4eyuPEE42i9PVsI_vio"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "4775156353-v65um3gbt0b8ls7rsnf9q6uocbk6h84p.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "4775156353-8sp26pvcbas99bm1a4fbcdke1fjv2351.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.bookfast.driver"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
