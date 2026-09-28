@@ -240,7 +240,7 @@ class TripDetailData {
     paymentDetail: json["paymentDetail"] == null ? null : PaymentDetail.fromJson(json["paymentDetail"]),
     amountGivenToDriver: json["amountGivenToDriver"],
     driverPaymentMethod: json["driverPaymentMethod"],
-    remainingAmountFromDriver: json["remainingAmountFromDriver"],
+    remainingAmountFromDriver: (json["remainingAmountFromDriver"] as num?)?.toInt(),
     createdbyadmin: json["createdbyadmin"],
     driver: json["driver"] == null ? null : DriverData.fromJson(json["driver"]),
   );

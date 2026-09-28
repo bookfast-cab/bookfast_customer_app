@@ -39,8 +39,7 @@ class _SearchDropLocationScreenState extends State<SearchDropLocationScreen> {
     }
     /// Preselect Pickup DateTime (+25 min)
     if (_controller.onwardDateTime.value == null) {
-      _controller.onwardDateTime.value =
-          DateTime.now().add(const Duration(minutes: 25));
+      _controller.onwardDateTime.value = DateTime.now().add(const Duration(minutes: 25));
     }
 
     super.initState();
@@ -62,186 +61,189 @@ class _SearchDropLocationScreenState extends State<SearchDropLocationScreen> {
   @override
   Widget build(BuildContext context) {
     return AppBaseScreen(
-        child: Stack(
+      child: Container(
+        color: AppColors.bfbackgroundColor, 
+        child: Column(
           children: [
-            Column(
-                  children: [
             CommonAppBar(
               titleText: AppStrings.strSearchYourLocation,
               isTitleCenter: false,
-              titleTextColor: AppColors.textColor100,
+              titleTextColor: Colors.black87,
               onBackPress: () {
                 Get.back();
               },
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Obx(() {
                   return SingleChildScrollView(
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (!_controller.isFromBookingScreen.value)
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const SizedBox(height: 8),
-                                  const CircleAvatar(
-                                    radius: 5,
-                                    backgroundColor: Colors.green,
-                                  ),
-                                  Container(
-                                    height: 50,
-                                    width: 2,
-                                    color: Colors.grey,
-                                  ),
-                                  const CircleAvatar(
-                                    radius: 5,
-                                    backgroundColor: Colors.red,
-                                  ),
-                                ],
+                        // Location Input Card
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.04),
+                                blurRadius: 15,
+                                offset: const Offset(0, 5),
                               ),
-                            if (!_controller.isFromBookingScreen.value) const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
+                            ],
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (!_controller.isFromBookingScreen.value)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 14),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Expanded(
-                                        child: SizedBox(
-                                          // height: 42,
+                                      const Icon(Icons.radio_button_checked, color: AppColors.bfprimarythemeColor2, size: 20),
+                                      Container(
+                                        height: 45,
+                                        width: 2,
+                                        color: Colors.grey.shade300,
+                                      ),
+                                      const Icon(Icons.location_on, color: Colors.red, size: 22),
+                                    ],
+                                  ),
+                                ),
+                              if (!_controller.isFromBookingScreen.value) const SizedBox(width: 12),
+                              
+                              Expanded(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Pick Up Field
+                                    Row(
+                                      children: [
+                                        Expanded(
                                           child: GooglePlaceAutoCompleteTextField(
-                                            containerHorizontalPadding: 10,
+                                            containerHorizontalPadding: 0,
                                             containerVerticalPadding: 0,
                                             focusNode: _controller.pickLocationFocusNode,
                                             textEditingController: _controller.pickAddressController.value,
-                                            boxDecoration: BoxDecoration(border: Border.all(color: AppColors.textColor30), borderRadius: BorderRadius.circular(10)),
+                                            boxDecoration: BoxDecoration(
+                                              color: AppColors.bfbackgroundColor, // Subtle contrast inside the card
+                                              borderRadius: BorderRadius.circular(12),
+                                              border: Border.all(color: Colors.transparent),
+                                            ),
                                             googleAPIKey: Platform.isIOS ? ApiConstants.mapIosKey : ApiConstants.mapAndroidKey,
-                                            textStyle: const TextStyle(fontSize: 14),
-                                            inputDecoration: const InputDecoration(
+                                            textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                            inputDecoration: InputDecoration(
+                                              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                                               hintText: "Enter Pick Address",
                                               hintStyle: TextStyle(
                                                 fontSize: 14.0,
-                                                color: AppColors.textColor30,
+                                                color: Colors.grey.shade500,
                                                 fontFamily: AppConstants.fontLexendRegular,
-                                                textBaseline: TextBaseline.alphabetic,
                                               ),
                                               border: InputBorder.none,
                                             ),
-                                            debounceTime: 800, // default 600 ms,
-                                            // countries: ["in", "fr"], // optional by default null is set
-                                            isLatLngRequired: true, // if you required coordinates from place detail
-                                            getPlaceDetailWithLatLng: (Prediction prediction) {
-                                              // this method will return latlng with place detail
-                                              // print("placeDetails" + prediction.lng.toString());
-                                            }, // this callback is called when isLatLngRequired is true
+                                            debounceTime: 800,
+                                            isLatLngRequired: true,
+                                            getPlaceDetailWithLatLng: (Prediction prediction) {},
                                             itemClick: (Prediction prediction) async {
-                                              /// Make user to add types=country|locality in google map places api in the plugin code. Line No. 111
-                                              /// String url = "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$text&key=${widget.googleAPIKey}&types=country|locality";
-                                              // _controller.getCurrentLocation(prediction);
-                                              // _controller.pickLocationFocusNode.unfocus();
-
                                               await _controller.onPickLocationSearchClick(prediction);
                                               await _controller.getCurrentLocation(prediction);
                                               _controller.pickLocationFocusNode.unfocus();
                                             },
-                                            // if we want to make custom list item builder
                                             itemBuilder: (context, index, Prediction prediction) {
-                                              return AppContainer(
-                                                padding: const EdgeInsets.all(10),
+                                              return Container(
+                                                padding: const EdgeInsets.all(12),
                                                 child: Row(
                                                   children: [
-                                                    const Icon(Icons.location_on),
-                                                    const SizedBox(
-                                                      width: 7,
-                                                    ),
-                                                    Expanded(child: Text(prediction.description ?? ""))
+                                                    const Icon(Icons.location_on, color: Colors.grey, size: 20),
+                                                    const SizedBox(width: 10),
+                                                    Expanded(child: Text(prediction.description ?? "", style: const TextStyle(fontSize: 13))),
                                                   ],
                                                 ),
                                               );
                                             },
-                                            // if you want to add seperator between list items
-                                            // seperatedBuilder: Divider(),
-                                            // want to show close icon
                                             isCrossBtnShown: true,
                                           ),
                                         ),
-                                      ),
-                                      const SizedBox(
-                                        width: 8,
-                                      ),
-                                      InkWell(
+                                        const SizedBox(width: 10),
+                                        InkWell(
                                           onTap: () {
                                             _controller.getCurrentLocation(null);
                                           },
-                                          child: const Icon(Icons.gps_fixed))
-                                    ],
-                                  ),
-                                  const SizedBox(height: 8),
-                                  if (!_controller.isFromBookingScreen.value)
-                                    SizedBox(
-                                      // height: 42,
-                                      child: GooglePlaceAutoCompleteTextField(
-                                        containerHorizontalPadding: 10,
+                                          child: Container(
+                                            padding: const EdgeInsets.all(10),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.bfCardLightBlue,
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                            child: const Icon(Icons.my_location, color: AppColors.bfprimarythemeColor2, size: 20),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    
+                                    if (!_controller.isFromBookingScreen.value) const SizedBox(height: 12),
+                                    
+                                    // Drop Off Field
+                                    if (!_controller.isFromBookingScreen.value)
+                                      GooglePlaceAutoCompleteTextField(
+                                        containerHorizontalPadding: 0,
                                         containerVerticalPadding: 0,
-
                                         focusNode: _controller.dropLocationFocusNode,
                                         textEditingController: _controller.dropAddressController.value,
-                                        boxDecoration: BoxDecoration(border: Border.all(color: AppColors.textColor30), borderRadius: BorderRadius.circular(10)),
+                                        boxDecoration: BoxDecoration(
+                                          color: AppColors.bfbackgroundColor,
+                                          borderRadius: BorderRadius.circular(12),
+                                          border: Border.all(color: Colors.transparent),
+                                        ),
                                         googleAPIKey: Platform.isIOS ? ApiConstants.mapIosKey : ApiConstants.mapAndroidKey,
-                                        textStyle: const TextStyle(fontSize: 14),
-                                        inputDecoration: const InputDecoration(
+                                        textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                        inputDecoration: InputDecoration(
+                                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                                           hintText: "Enter Drop Address",
                                           hintStyle: TextStyle(
                                             fontSize: 14.0,
-                                            color: AppColors.textColor30,
+                                            color: Colors.grey.shade500,
                                             fontFamily: AppConstants.fontLexendRegular,
-                                            textBaseline: TextBaseline.alphabetic,
                                           ),
                                           border: InputBorder.none,
                                         ),
-                                        debounceTime: 800, // default 600 ms,
-                                        // countries: ["in", "fr"], // optional by default null is set
-                                        isLatLngRequired: true, // if you required coordinates from place detail
-                                        getPlaceDetailWithLatLng: (Prediction prediction) {
-                                          // this method will return latlng with place detail
-                                          // print("placeDetails" + prediction.lng.toString());
-                                        }, // this callback is called when isLatLngRequired is true
+                                        debounceTime: 800,
+                                        isLatLngRequired: true,
+                                        getPlaceDetailWithLatLng: (Prediction prediction) {},
                                         itemClick: (Prediction prediction) {
-                                          /// Make user to add types=country|locality in google map places api in the plugin code. Line No. 111
-                                          /// String url = "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$text&key=${widget.googleAPIKey}&types=country|locality";
                                           _controller.onDropLocationSearchClick(prediction);
                                           _controller.dropLocationFocusNode.unfocus();
                                         },
-                                        // if we want to make custom list item builder
                                         itemBuilder: (context, index, Prediction prediction) {
-                                          return AppContainer(
-                                            padding: const EdgeInsets.all(10),
+                                          return Container(
+                                            padding: const EdgeInsets.all(12),
                                             child: Row(
                                               children: [
-                                                const Icon(Icons.location_on),
-                                                const SizedBox(
-                                                  width: 7,
-                                                ),
-                                                Expanded(child: Text(prediction.description ?? ""))
+                                                const Icon(Icons.location_on, color: Colors.grey, size: 20),
+                                                const SizedBox(width: 10),
+                                                Expanded(child: Text(prediction.description ?? "", style: const TextStyle(fontSize: 13))),
                                               ],
                                             ),
                                           );
                                         },
                                         isCrossBtnShown: true,
                                       ),
-                                    ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                        const SizedBox(height: 16),
+                        
+                        const SizedBox(height: 24),
+
+                        // Travel Preferences Section
                         Obx(() {
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -250,14 +252,15 @@ class _SearchDropLocationScreenState extends State<SearchDropLocationScreen> {
                                 children: [
                                   AppTextWidget(
                                     "How do you want to travel?",
-                                    style: AppTextStyles.body2RegularTextStyle(textColor: Colors.black,fontSize: 14,fontWeight: FontWeight.w600),
+                                    style: const TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.bold),
                                   ),
-                                  SizedBox(width: 6,),
-                                  Image.asset(AppImages.icRoadTrip,height: 30,width: 30,color: AppColors.bfPrimaryColor,)
+                                  const SizedBox(width: 8),
+                                  Image.asset(AppImages.icRoadTrip, height: 24, width: 24, color: AppColors.bfprimarythemeColor2),
                                 ],
                               ),
                               const SizedBox(height: 16),
 
+                              // One Way vs Round Trip Toggle
                               Row(
                                 children: [
                                   _tripTypeCard(
@@ -276,15 +279,15 @@ class _SearchDropLocationScreenState extends State<SearchDropLocationScreen> {
                                 ],
                               ),
 
-                              /// Date time  round trip
+                              // Date & Time Selectors for Round Trip
                               if (!_controller.isOneWayTrip.value) ...[
-                                const SizedBox(height: 10),
+                                const SizedBox(height: 16),
                                 _dateTimeTile(
                                   title: "PickUp Date & Time",
                                   dateTime: _controller.onwardDateTime.value,
                                   onTap: () => _pickCustomDateTime(isReturn: false),
                                 ),
-                                const SizedBox(height: 6),
+                                const SizedBox(height: 10),
                                 _dateTimeTile(
                                   title: "Return Date & Time",
                                   dateTime: _controller.returnDateTime.value,
@@ -294,44 +297,60 @@ class _SearchDropLocationScreenState extends State<SearchDropLocationScreen> {
                             ],
                           );
                         }),
-                       /// Search button ////
-                         const SizedBox(height: 20),
-                        AppButton(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          onClick: (_controller.isFromBookingScreen.value || _controller.isDropLocationSelected.value)
+                        
+                        const SizedBox(height: 32),
+
+                        // Search Action Button
+                        InkWell(
+                          onTap: (_controller.isFromBookingScreen.value || _controller.isDropLocationSelected.value)
                               ? () {
                                   if (!_controller.isFromBookingScreen.value) {
-                                    /// ROUND TRIP VALIDATION
                                     if (!_controller.isOneWayTrip.value) {
-                                      if (_controller.onwardDateTime.value == null ||
-                                          _controller.returnDateTime.value == null) {
-                                        AppCommonWidgets.showAppToast(
-                                          "Please select pick up date & time and return date & time",
-                                        );
+                                      if (_controller.onwardDateTime.value == null || _controller.returnDateTime.value == null) {
+                                        AppCommonWidgets.showAppToast("Please select pick up date & time and return date & time");
                                         return;
                                       }
                                     }
-
-                                    ///  normal flow
                                     validateLocations();
                                   } else {
                                     Get.back(result: true);
                                   }
                                 }
                               : null,
-                          title: _controller.isFromBookingScreen.value ? 'Done' : AppStrings.strSearch,
-                          bgColor: (_controller.isFromBookingScreen.value || _controller.isDropLocationSelected.value) ? AppColors.bfPrimaryColor : AppColors.textColor30,
-                        )
+                          borderRadius: BorderRadius.circular(14),
+                          child: Container(
+                            height: 50,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: (_controller.isFromBookingScreen.value || _controller.isDropLocationSelected.value) 
+                                ? AppColors.bfprimarythemeColor2 
+                                : Colors.grey.shade400,
+                              borderRadius: BorderRadius.circular(14),
+                              boxShadow: (_controller.isFromBookingScreen.value || _controller.isDropLocationSelected.value) 
+                                ? [BoxShadow(color: AppColors.bfprimarythemeColor2.withOpacity(0.3), blurRadius: 12, offset: const Offset(0, 5))]
+                                : [],
+                            ),
+                            child: Text(
+                              _controller.isFromBookingScreen.value ? 'Done' : AppStrings.strSearch,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
                       ],
                     ),
                   );
                 }),
               ),
             ),
-                  ],
-                ),
           ],
-        ));
+        ),
+      ),
+    );
   }
 
   void validateLocations() {
@@ -345,6 +364,7 @@ class _SearchDropLocationScreenState extends State<SearchDropLocationScreen> {
       Get.back(result: true);
     }
   }
+
   Widget _tripTypeCard({
     required String title,
     required IconData icon,
@@ -354,33 +374,34 @@ class _SearchDropLocationScreenState extends State<SearchDropLocationScreen> {
     return Expanded(
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 6),
+          padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: isSelected
-                  ? AppColors.bfPrimaryColor
-                  : AppColors.textColor30,
-              width: 1.4,
+              color: isSelected ? AppColors.bfprimarythemeColor2 : Colors.grey.shade300,
+              width: 1.5,
             ),
-            color: isSelected
-                ? AppColors.bfPrimaryColor.withOpacity(0.08)
-                : Colors.transparent,
+            color: isSelected ? AppColors.bfCardLightBlue : Colors.white,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              AppTextWidget(
-                 title,
-                style: AppTextStyles.body1RegularTextStyle(textColor: Colors.black,fontSize: 14,fontWeight: FontWeight.w600),
+              Text(
+                title,
+                style: TextStyle(
+                  color: isSelected ? AppColors.bfprimarythemeColor2 : Colors.grey.shade700,
+                  fontSize: 14,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                ),
               ),
-              const SizedBox(width: 6),
-              Icon(icon,
-                  color: isSelected
-                      ? AppColors.bfPrimaryColor
-                      : Colors.black),
+              const SizedBox(width: 8),
+              Icon(
+                icon,
+                size: 18,
+                color: isSelected ? AppColors.bfprimarythemeColor2 : Colors.grey.shade600,
+              ),
             ],
           ),
         ),
@@ -393,74 +414,63 @@ class _SearchDropLocationScreenState extends State<SearchDropLocationScreen> {
     required DateTime? dateTime,
     required VoidCallback onTap,
   }) {
-    final String ShowDateTimeText = dateTime != null
+    final String showDateTimeText = dateTime != null
         ? "${title.contains("Return") ? "Return" : "PickUp"}: "
         "${AppFunctions.convertDateToYYYYMMDDHHMM(dateTime)}"
-        : title ;
+        : title;
 
-
-    final Color borderColor = dateTime == null
-        ? Colors.grey.shade300
-        : AppColors.bfPrimaryColor.withOpacity(0.5);
-
-    final Color textColor = dateTime == null
-        ? Colors.black
-        : Colors.black;
+    final Color borderColor = dateTime == null ? Colors.grey.shade300 : AppColors.bfprimarythemeColor2.withOpacity(0.5);
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          boxShadow: const [
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
             BoxShadow(
-              color: Color(0x14000000),
+              color: Colors.black.withOpacity(0.03),
               blurRadius: 10,
-              offset: Offset(0, 4),
+              offset: const Offset(0, 4),
             ),
           ],
-          border: Border.all(color: borderColor),
+          border: Border.all(color: borderColor, width: 1.2),
         ),
         child: Row(
           children: [
             Container(
-              height: 36,
-              width: 36,
+              height: 40,
+              width: 40,
               decoration: BoxDecoration(
-                color: AppColors.bfPrimaryColor.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(10),
+                color: AppColors.bfCardLightBlue,
+                borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
                 Icons.calendar_month,
-                size: 18,
-                color: AppColors.bfPrimaryColor,
+                size: 20,
+                color: AppColors.bfprimarythemeColor2,
               ),
             ),
-
-            const SizedBox(width: 12),
-
+            const SizedBox(width: 14),
             Expanded(
-              child: AppTextWidget(
-                ShowDateTimeText,
+              child: Text(
+                showDateTimeText,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: AppTextStyles.body2RegularTextStyle(
-                  textColor: textColor,
-                 // fontWeight: FontWeight.w600,
+                style: const TextStyle(
+                  color: Colors.black87,
                   fontSize: 14,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
-
             const SizedBox(width: 8),
-
-            const Icon(
+            Icon(
               Icons.arrow_forward_ios,
               size: 14,
-              color: Colors.black,
+              color: Colors.grey.shade400,
             ),
           ],
         ),
@@ -468,13 +478,13 @@ class _SearchDropLocationScreenState extends State<SearchDropLocationScreen> {
     );
   }
 
-
   _pickCustomDateTime({required bool isReturn}) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: Colors.transparent, // In case custom picker has a wrapper
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (_) => CustomDateTimePicker(
         isReturn: isReturn,
@@ -490,7 +500,4 @@ class _SearchDropLocationScreenState extends State<SearchDropLocationScreen> {
       ),
     );
   }
-
-
-
 }

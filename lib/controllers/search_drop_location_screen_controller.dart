@@ -25,6 +25,8 @@ class SearchDropLocationController extends GetxController{
   var pickLng = 0.0.obs;
   var dropLat = 0.0.obs;
   var dropLng = 0.0.obs;
+  RxString dropAddressText = ''.obs;  // Reactive drop address text for UI updates
+  RxString pickAddressText = ''.obs;  // Reactive pick address text for UI updates
 
   RxBool isOneWayTrip = true.obs;
 
@@ -58,7 +60,7 @@ class SearchDropLocationController extends GetxController{
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        Get.snackbar('Location Error', 'Please enable location services.');
+        debugPrint('Location Error: Please enable location services.');
         return;
       }
 
@@ -66,13 +68,13 @@ class SearchDropLocationController extends GetxController{
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          Get.snackbar('Permission Denied', 'Location permission is required.');
+          debugPrint('Permission Denied: Location permission is required.');
           return;
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
-        Get.snackbar('Permission Denied', 'Location permissions are permanently denied.');
+        debugPrint('Permission Denied: Location permissions are permanently denied.');
         return;
       }
       Position position = await Geolocator.getCurrentPosition(
@@ -137,6 +139,7 @@ class SearchDropLocationController extends GetxController{
     selectedLocationData.value = prediction;
     if (prediction.description != null) {
       dropAddressController.value.text = prediction.description!;
+      dropAddressText.value = prediction.description!; // Reactive update
 
       List<Location> locations = await locationFromAddress(prediction.description!);
       if (locations.isNotEmpty) {

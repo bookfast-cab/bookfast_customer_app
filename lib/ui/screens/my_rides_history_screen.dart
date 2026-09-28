@@ -47,8 +47,6 @@ class _MyRidesHistoryScreenState extends State<MyRidesHistoryScreen> {
     super.initState();
   }
 
-
-
   @override
   void dispose() {
     _controller.removeScrollListener();
@@ -65,452 +63,508 @@ class _MyRidesHistoryScreenState extends State<MyRidesHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.bfPrimaryColor,
+      color: AppColors.bfbackgroundColor, // Modern background
       child: SafeArea(
-        left: true,
-        top: true,
-        right: true,
-        bottom: true,
         child: Scaffold(
           key: _scaffoldKey,
+          backgroundColor: Colors.transparent,
           drawer: const AppDrawer(),
-          body: RefreshIndicator(
-            onRefresh: onRefresh,
-            child: Column(
-              children: [
-                CommonAppBar(
-                  titleText: AppStrings.strMyRides,
-                  isTitleCenter: false,
-                  titleTextColor: AppColors.textColor100,
-                  leadingWidget: IconButton(
-                    icon: Icon(Icons.arrow_back_ios),
-                    onPressed: () {
-                      Get.back();
-                      // _scaffoldKey.currentState?.openDrawer();
-                    },
+          body: Column(
+            children: [
+              CommonAppBar(
+                titleText: AppStrings.strMyRides,
+                isTitleCenter: false,
+                titleTextColor: Colors.black87,
+                backgroundColor: Colors.transparent,
+                leadingWidget: IconButton(
+                  icon: const Icon(Icons.arrow_back_ios, color: Colors.black87),
+                  onPressed: () {
+                    Get.back();
+                  },
+                ),
+              ),
+              
+              // Status Tabs (Pill shaped)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  child: Row(
+                    children: [
+                      _statusButton('All Trips', 0),
+                      _statusButton('Accepted', 1),
+                      _statusButton('Started', 3),
+                      _statusButton('Completed', 4),
+                      _statusButton('Cancelled', 5)
+                    ],
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  child: SingleChildScrollView(
-                     scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        _statusButton('All Trips', 0),
-                        _statusButton('Accepted', 1),
-                        _statusButton('Started', 3),
-                        _statusButton('Completed', 4),
-                        _statusButton('Cancelled', 5)
+              ),
 
-                      ],
-                    ),
-                  ),
-                ),
-
-                Obx(() {
-                  var rideStatus = _controller.selectedStatus.value == 0
+              // Rides List
+              Expanded(
+                child: Obx(() {
+                  var rideList = _controller.selectedStatus.value == 0
                       ? _controller.myRides
                       : _controller.myRides
-                      .where((ride) => (ride.status ?? -1) == _controller.selectedStatus.value)
-                      .toList();
+                          .where((ride) => (ride.status ?? -1) == _controller.selectedStatus.value)
+                          .toList();
 
-                  if (rideStatus.isEmpty) {
-                    return SizedBox(
-                      height: Get.height / 2,
-                      child: AppCommonWidgets.noDataWidget(text: 'Empty Rides'),
-                    );
+                  if (rideList.isEmpty && !_controller.hasMore.value && !_controller.isLoading.value) {
+                    return AppCommonWidgets.noDataWidget(text: 'No rides found');
                   }
-                  return Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                      child: ListView.builder(
-                          controller: _controller.scrollController,
-                          itemCount: _controller.myRides.length + 1,
-                          itemBuilder: (context, index) {
-                            if (index == _controller.myRides.length) {
-                              return _controller.hasMore.value ? const Center(child: CircularProgressIndicator()) : const SizedBox();
-                            }
-                            final ride = _controller.myRides[index];
-                            bool showButtons = false;
 
-
-                            if ((_controller.myRides[index].status ?? 0) == 5) {
-                              showButtons = false;
-                            } else {
-                              if (_controller.myRides[index].pickupDate != null) {
-                                DateTime now = DateTime.now();
-
-                                if (_controller.myRides[index].pickupDate!.isAfter(now)) {
-                                  showButtons = true;
-                                } else {
-                                  showButtons = false;
-                                }
-                              }
-                            }
-
-                            return
-                                Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 10.0),
-                              child: AppContainer(
-                                padding: const EdgeInsets.all(8),
-                                allBorderRadius: 12,
-                                borderColor: AppColors.textColor30,
-                                child: Column(
-                                  children: [
-                                    Container(
-                                        decoration: BoxDecoration(
-                                          color: AppColors.bfPrimaryColor.withOpacity(0.05),
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                        padding: const EdgeInsets.all(10),
-                                        child: Column(children: [
-                                          _rideDetail('Pick point', titleTextColor: AppColors.primaryColor100, _controller.myRides[index].pickupAddress ?? ''),
-                                          const SizedBox(height: 8),
-                                          const Divider(height: 1, color: AppColors.textColor40),
-                                          const SizedBox(height: 8),
-                                          _rideDetail('Drop point', titleTextColor: AppColors.dangerPrimaryColor, _controller.myRides[index].dropAddress ?? ''),
-
-                                        ])),
-                                    // _rideDetail('Pick point', titleTextColor: AppColors.primaryColor100, _controller.myRides[index].pickupAddress ?? ''),
-                                    // const SizedBox(
-                                    //   height: 10,
-                                    // ),
-                                    // _rideDetail('Drop point', titleTextColor: AppColors.dangerPrimaryColor, _controller.myRides[index].dropAddress ?? ''),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    _rideDetail('Distance', "${_controller.myRides[index].distance ?? ''} km"),
-
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    if(_controller.myRides[index].driverAllowance != null && _controller.myRides[index].driverAllowance != 0) ...[
-                                    _rideDetail('Driver Allowance', "₹${_controller.myRides[index].driverAllowance?.toString() ?? '0'}"),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    ],
-
-                                    /// Show this only when discount is greater than 0
-
-                                    if (_controller.myRides[index].discount != null && _controller.myRides[index].discount! > 0) ...[
-                                      _rideDetail('Subtotal', "₹ ${_controller.myRides[index].subTotal!.toStringAsFixed(2)}"),
-                                      const SizedBox(height: 10),
-                                      _rideDetail('Discount', "₹ ${_controller.myRides[index].discount!.toStringAsFixed(2)}"),
-                                      const SizedBox(height: 10),
-                                    ],
-
-                                    _rideDetail('Trip type', getTripType(_controller.myRides[index].tripType)),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    _rideDetail('Trip sub type', _controller.myRides[index].tripSubType == 1 ? "One Way" : "Round Trip"),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    if (_controller.myRides[index].tripSubType == 2)
-                                    Column(
-                                      children: [
-                                        _rideDetail(
-                                            'Pickup date',
-                                            AppFunctions.convertDateToYYYYMMDDHHMM(
-                                              _controller.myRides[index].pickupDate != null ? _controller.myRides[index].pickupDate! : null,
-                                            )),
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                        _rideDetail(
-                                            'Return date',
-                                            AppFunctions.convertDateToYYYYMMDDHHMM(
-                                              _controller.myRides[index].pickupDate != null ? _controller.myRides[index].returnDateTime! : null,
-                                            )),
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                      ],
-                                    ),
-                                    _rideDetail('Vehicle type', getVehicleType(_controller.myRides[index].vehicleType)),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    _rideDetail(
-                                        'Created at',
-                                        AppFunctions.convertDateToYYYYMMDDHHMM(
-                                          _controller.myRides[index].pickupDate != null ? _controller.myRides[index].createdAt! : null,
-                                        )),
-                                    if (_controller.myRides[index].tripSubType == 1)
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    if (_controller.myRides[index].tripSubType == 1)
-                                    _rideDetail(
-                                        'Pickup date',
-                                        AppFunctions.convertDateToYYYYMMDDHHMM(
-                                          _controller.myRides[index].pickupDate != null ? _controller.myRides[index].pickupDate! : null,
-                                        )),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    _rideDetail('Total amount', "₹ ${_controller.myRides[index].total?.toStringAsFixed(2) }"),
-
-
-                                    /// Show status ride start ///
-                                    if ((_controller.myRides[index].status ?? 0) == 3)
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                    if (_controller.myRides[index].status == 3)
-                                      _rideDetail('Ride status', _controller.myRides[index].status == 3 ? 'Your ride has start' : '',
-                                        subtitleTextColor: AppColors.primaryColor100,
-                                      ),
-                                    /// Show status completed ride ///
-                                    if ((_controller.myRides[index].status ?? 0) == 4)
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                    if (_controller.myRides[index].status == 4)
-                                      _rideDetail('Ride status', _controller.myRides[index].status == 4 ? 'Ride Completed' : '',
-                                        subtitleTextColor: AppColors.primaryColor100,
-                                      ),
-                                    /// Show cancelled ride ///
-                                    if ((_controller.myRides[index].status ?? 0) == 5)
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                    if (_controller.myRides[index].status == 5)
-                                      _rideDetail(
-                                        'Ride status',
-                                        _controller.myRides[index].status == 5 ? 'Cancelled' : '',
-                                        subtitleTextColor: AppColors.dangerPrimaryColor,
-                                      ),
-                                    if (_controller.myRides[index].status == 5)
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    if (_controller.myRides[index].status == 5)
-                                      _rideDetail(
-                                        'Cancelled reason',
-                                        _controller.myRides[index].cancelledReason ?? '',
-                                        subtitleTextColor: AppColors.dangerPrimaryColor,
-                                      ),
-                                    //   if (_controller.selectedStatus.value == 0)
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-
-                                  ///    Cancelled button
-                                    if ([0, 1, 6, 7, 8, 9].contains(_controller.myRides[index].status))
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: AppButton(
-                                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                              title: AppStrings.strCancelRide,
-                                              onClick: () {
-                                                _controller.hitTripCancelReasonsApi(callBack: () {
-                                                  showCancelRideDialog(_controller.myRides[index].id!);
-                                                });
-                                              },
-                                              bgColor: AppColors.bfPrimaryColor,
-                                            ),
-                                          ),
-                                          /// Call button
-                                          const SizedBox(width: 10),
-                                          Expanded(
-                                            child: AppButton(
-                                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                              title: "Admin call",
-                                              onClick: () async {
-                                               // _makePhoneCall("8817430000");
-
-                                                String? helpline = await SessionManager.getHelplineNumber();
-                                                final numberToCall = helpline?.isNotEmpty == true ? helpline : "8817430000";
-
-                                                final Uri callUri = Uri.parse("tel:$numberToCall");
-
-                                                if (await canLaunchUrl(callUri)) {
-                                                await launchUrl(callUri);
-                                                } else {
-                                                print("Could not launch $callUri");
-                                                }
-                                              },
-                                              bgColor: AppColors.primaryColor100,
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    SizedBox(height: 15,),
-                                    if((_controller.myRides[index].status == 1) || _controller.myRides[index].status == 3)
-                                    AppButton(
-                                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                      bgColor: AppColors.bfPrimaryColor,
-                                      title: 'Track',
-                                      onClick: (){
-                                        print(" print-> under track 1 ");
-                                        String? id = _controller.myRides[index].id.toString();
-                                        Get.to(CurrentRideDetailScreen(tripId: id.toString()));
-                                      },
-                                    )
-                                  ],
-                                ),
-                                onTap: () {
-                                  // int? id = _controller.myRides[index].id;
-                                  // Get.to(TripDetailScreen(id: id));
-                                },
-                              ),
-                            );
-                            // : const SizedBox();
-                          }),
+                  return RefreshIndicator(
+                    onRefresh: onRefresh,
+                    color: AppColors.bfprimarythemeColor2,
+                    child: ListView.builder(
+                      controller: _controller.scrollController,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      itemCount: rideList.length + 1,
+                      itemBuilder: (context, index) {
+                        if (index == rideList.length) {
+                          return _controller.hasMore.value 
+                            ? const Padding(padding: EdgeInsets.all(16), child: Center(child: CircularProgressIndicator())) 
+                            : const SizedBox();
+                        }
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16.0),
+                          child: _buildModernRideCard(rideList[index]),
+                        );
+                      },
                     ),
                   );
-                })
-              ],
-            ),
+                }),
+              )
+            ],
           ),
         ),
       ),
     );
   }
 
-  // void _makePhoneCall(String phoneNumber) async {
-  //
-  //   final Uri callUri = Uri.parse("tel:$phoneNumber");
-  //
-  //   if (await canLaunchUrl(callUri)) {
-  //     await launchUrl(callUri);
-  //   } else {
-  //     print("Could not launch $callUri");
-  //   }
-  // }
+  // Modern Ride Card UI
+  Widget _buildModernRideCard(ride) {
+    bool showActionButtons = [0, 1, 6, 7, 8, 9].contains(ride.status);
+    bool showTrackButton = (ride.status == 1 || ride.status == 3);
 
-  String getVehicleType(int? type) {
-    return type == 1
-        ? "Hatchback"
-        : type == 2
-        ? "Sedan"
-        : type == 3
-            ? "SUV"
-            : type == 4
-                ? "SUV Prime"
-                : "";
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header: Ride ID & Status Pill
+          Padding(
+            padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.receipt_long, color: AppColors.bfprimarythemeColor2, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      "Ride #${ride.id ?? ''}",
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.black87),
+                    ),
+                  ],
+                ),
+                _buildStatusPill(ride.status ?? 0),
+              ],
+            ),
+          ),
+          
+          Divider(height: 1, color: Colors.grey.shade100),
+
+          // Address Section (Timeline UI)
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Column(
+                  children: [
+                    const SizedBox(height: 2),
+                    const Icon(Icons.radio_button_checked, size: 16, color: AppColors.bfprimarythemeColor2),
+                    Container(height: 35, width: 2, color: Colors.grey.shade300),
+                    const Icon(Icons.location_on, size: 18, color: Colors.red),
+                  ],
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        ride.pickupAddress ?? 'N/A',
+                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.black87),
+                        maxLines: 2, overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 18),
+                      Text(
+                        ride.dropAddress ?? 'N/A',
+                        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.black87),
+                        maxLines: 2, overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          Divider(height: 1, color: Colors.grey.shade100),
+
+          // Explicit Trip Details List
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                _buildDetailRow("Distance", "${ride.distance ?? 0} km"),
+                _buildDetailRow("Trip Type", getTripType(ride.tripType)),
+                _buildDetailRow("Trip Sub Type", ride.tripSubType == 1 ? "One Way" : "Round Trip"),
+                _buildDetailRow("Vehicle Type", getVehicleType(ride.vehicleType)),
+                _buildDetailRow("Pickup Date", AppFunctions.convertDateToYYYYMMDDHHMM(ride.pickupDate) ?? 'N/A'),
+                if (ride.tripSubType == 2 && ride.returnDateTime != null)
+                  _buildDetailRow("Return Date", AppFunctions.convertDateToYYYYMMDDHHMM(ride.returnDateTime) ?? 'N/A'),
+                _buildDetailRow("Created At", AppFunctions.convertDateToYYYYMMDDHHMM(ride.createdAt) ?? 'N/A', isLast: true),
+              ],
+            ),
+          ),
+
+          // Cancel Reason (If any)
+          if (ride.status == 5 && ride.cancelledReason != null)
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: Colors.red.shade50, borderRadius: BorderRadius.circular(10)),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.info_outline, color: Colors.red, size: 18),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      "Reason: ${ride.cancelledReason}",
+                      style: TextStyle(color: Colors.red.shade800, fontSize: 12, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          if (ride.status == 5 && ride.cancelledReason != null) const SizedBox(height: 12),
+
+          // Pricing Summary Box
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: AppColors.bfCardLightBlue,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              children: [
+                if ((ride.driverAllowance ?? 0) > 0)
+                  _pricingRow("Driver Allowance", "₹${ride.driverAllowance}"),
+                if ((ride.discount ?? 0) > 0) ...[
+                  _pricingRow("Subtotal", "₹${(ride.subTotal ?? 0).toStringAsFixed(2)}"),
+                  _pricingRow("Discount", "-₹${(ride.discount ?? 0).toStringAsFixed(2)}", isDiscount: true),
+                ],
+                if ((ride.driverAllowance ?? 0) > 0 || (ride.discount ?? 0) > 0)
+                  const Divider(color: Colors.white, thickness: 1.5, height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text("Total Amount", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87)),
+                    Text(
+                      "₹${(ride.total ?? 0).toStringAsFixed(2)}", 
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.bfprimarythemeColor2)
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          
+          // Action Buttons
+          if (showActionButtons || showTrackButton)
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  if (showActionButtons)
+                    Expanded(
+                      child: _actionButton("Cancel Ride", () {
+                        _controller.hitTripCancelReasonsApi(callBack: () {
+                          showCancelRideDialog(ride.id!);
+                        });
+                      }, isDanger: true),
+                    ),
+                  if (showActionButtons) const SizedBox(width: 10),
+                  if (showActionButtons)
+                    Expanded(
+                      child: _actionButton("Support", () async {
+                        String? helpline = await SessionManager.getHelplineNumber();
+                        final numberToCall = helpline?.isNotEmpty == true ? helpline : "8817430000";
+                        final Uri callUri = Uri.parse("tel:$numberToCall");
+                        if (await canLaunchUrl(callUri)) await launchUrl(callUri);
+                      }, outline: true),
+                    ),
+                  if (showActionButtons && showTrackButton) const SizedBox(width: 10),
+                  if (showTrackButton)
+                    Expanded(
+                      child: _actionButton("Track Ride", () {
+                        Get.to(CurrentRideDetailScreen(tripId: ride.id.toString()));
+                      }),
+                    ),
+                ],
+              ),
+            ),
+          
+          if (!showActionButtons && !showTrackButton)
+            const SizedBox(height: 8),
+        ],
+      ),
+    );
   }
 
-  String getTripType(int? type) {
-    return type == 1
-        ? "Local ride"
-        : type == 3
-        ? "Outstation"
-        : "";
+  // Sub-widgets for the Ride Card
+  Widget _buildDetailRow(String label, String value, {bool isLast = false}) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: isLast ? 0 : 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(color: Colors.grey.shade600, fontSize: 13, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              style: const TextStyle(color: Colors.black87, fontSize: 13, fontWeight: FontWeight.w600),
+              maxLines: 2,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _pricingRow(String label, String value, {bool isDiscount = false}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: TextStyle(color: Colors.grey.shade700, fontSize: 13)),
+          Text(value, style: TextStyle(color: isDiscount ? Colors.green.shade600 : Colors.black87, fontSize: 13, fontWeight: FontWeight.w600)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusPill(int status) {
+    String text;
+    Color bgColor;
+    Color textColor;
+
+    switch (status) {
+      case 0: text = "Pending"; bgColor = Colors.orange.shade50; textColor = Colors.orange.shade800; break;
+      case 1: text = "Accepted"; bgColor = AppColors.bfCardLightBlue; textColor = AppColors.bfprimarythemeColor2; break;
+      case 3: text = "Started"; bgColor = Colors.blue.shade50; textColor = Colors.blue.shade800; break;
+      case 4: text = "Completed"; bgColor = Colors.green.shade50; textColor = Colors.green.shade800; break;
+      case 5: text = "Cancelled"; bgColor = Colors.red.shade50; textColor = Colors.red.shade800; break;
+      default: text = ""; bgColor = Colors.grey.shade100; textColor = Colors.grey.shade700;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(20)),
+      child: Text(text, style: TextStyle(color: textColor, fontSize: 11, fontWeight: FontWeight.bold)),
+    );
+  }
+
+  Widget _actionButton(String title, VoidCallback onTap, {bool outline = false, bool isDanger = false}) {
+    Color primaryColor = isDanger ? Colors.red.shade500 : AppColors.bfprimarythemeColor2;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        height: 42,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: outline ? Colors.transparent : primaryColor,
+          border: outline ? Border.all(color: primaryColor, width: 1.2) : null,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          title, 
+          style: TextStyle(
+            color: outline ? primaryColor : Colors.white, 
+            fontWeight: FontWeight.bold, 
+            fontSize: 13
+          )
+        ),
+      ),
+    );
   }
 
   Widget _statusButton(String text, int status) {
     return Obx(() {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 5),
-        child: AppContainer(
-          padding: const EdgeInsets.all(5),
-          allBorderRadius: 10,
-          borderWidth: _controller.selectedStatus.value == status ? 1.5 : 1,
-          borderColor: _controller.selectedStatus.value == status ? AppColors.bfPrimaryColor : AppColors.textColor30,
-          child: AppTextWidget(
-            text,
-            style: AppTextStyles.body2RegularTextStyle(
-                fontWeight: FontWeight.w600, fontSize: 14, textColor: _controller.selectedStatus.value == status ? AppColors.bfPrimaryColor : AppColors.textColor40),
+      bool isSelected = _controller.selectedStatus.value == status;
+      return GestureDetector(
+        onTap: () {
+          _controller.selectedStatus.value = status;
+          _controller.hitTripHistory(callBack: () {});
+        },
+        child: Container(
+          margin: const EdgeInsets.only(right: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.bfprimarythemeColor2 : Colors.white,
+            borderRadius: BorderRadius.circular(25),
+            border: Border.all(color: isSelected ? AppColors.bfprimarythemeColor2 : Colors.grey.shade300, width: 1.2),
+            boxShadow: isSelected 
+              ? [BoxShadow(color: AppColors.bfprimarythemeColor2.withOpacity(0.25), blurRadius: 8, offset: const Offset(0, 3))] 
+              : [],
           ),
-          onTap: () {
-            _controller.selectedStatus.value = status;
-            _controller.hitTripHistory(callBack: () {});
-          },
+          child: Text(
+            text,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+              color: isSelected ? Colors.white : Colors.grey.shade700,
+            ),
+          ),
         ),
       );
     });
   }
 
-  _rideDetail(String text, String data, {Color? titleTextColor, Color? subtitleTextColor}) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        AppTextWidget(
-          text,
-          style: AppTextStyles.body2RegularTextStyle(fontWeight: FontWeight.w500, fontSize: 14, textColor: titleTextColor ?? AppColors.textColor90),
-        ),
-        const SizedBox(width: 30),
-        Expanded(
-          child: Align(
-            alignment: Alignment.centerRight,
-            child: AppTextWidget(
-              data,
-              style: AppTextStyles.body2RegularTextStyle(fontWeight: FontWeight.w600, fontSize: 15, textColor: subtitleTextColor ?? AppColors.backColor30),
-              maxLines: 2,
-            ),
-          ),
-        ),
-      ],
-    );
+  String getVehicleType(int? type) {
+    switch(type) {
+      case 1: return "Hatchback";
+      case 2: return "Sedan";
+      case 3: return "SUV";
+      case 4: return "SUV Prime";
+      default: return "N/A";
+    }
   }
 
-  /// this dialog for cancel he ride by customer
+  String getTripType(int? type) {
+    switch(type) {
+      case 1: return "Local Ride";
+      case 3: return "Outstation";
+      default: return "Ride";
+    }
+  }
+
   void showCancelRideDialog(int tripId) {
     Get.dialog(
       Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: Colors.white,
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(24.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              AppTextWidget(
-                "Please give the reason for cancel ride !",
-                style: AppTextStyles.body2RegularTextStyle(textColor: AppColors.backColor20, fontSize: 15, fontWeight: FontWeight.w600),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.warning_amber_rounded, size: 36, color: Colors.red),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                "Cancel Ride",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
               ),
               const SizedBox(height: 8),
+              Text(
+                "Please select a reason for cancelling your ride.",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey.shade600, fontSize: 13, fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: 24),
               Obx(() {
                 return SizedBox(
-                  height: Get.height * 0.4,
+                  height: Get.height * 0.35,
                   child: ListView.builder(
-                      itemCount: _controller.cancelRideModel.length,
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: AppContainer(
-                            padding: const EdgeInsets.all(5),
-                            allBorderRadius: 10,
-                            borderColor: AppColors.textColor30,
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: AppTextWidget(
-                                _controller.cancelRideModel[index].reason ?? '',
-                                style: AppTextStyles.body2RegularTextStyle(
-                                  textColor: AppColors.backColor30,
-                                  fontSize: 14,
-                                ),
-                                onTap: () {
-                                  _controller.selectedReason.value = _controller.cancelRideModel[index];
-                                  _controller.hitCustomerCancelTripApi(
-                                      tripId: tripId,
-                                      callBack: () {
-                                        Get.offAll(const HomeMapViewScreen());
-                                      });
-                                },
-                              ),
-                            ),
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: _controller.cancelRideModel.length,
+                    itemBuilder: (context, index) {
+                      return InkWell(
+                        onTap: () {
+                          _controller.selectedReason.value = _controller.cancelRideModel[index];
+                          _controller.hitCustomerCancelTripApi(
+                            tripId: tripId,
+                            callBack: () {
+                              Get.offAll(const HomeMapViewScreen());
+                            }
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.grey.shade200),
+                            color: AppColors.bfbackgroundColor,
                           ),
-                        );
-                      }),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  _controller.cancelRideModel[index].reason ?? '',
+                                  style: const TextStyle(color: Colors.black87, fontSize: 13, fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                              Icon(Icons.chevron_right, color: Colors.grey.shade400, size: 20)
+                            ],
+                          ),
+                        ),
+                      );
+                    }
+                  ),
                 );
               }),
-              AppContainer(
-                height: 45,
-                allBorderRadius: 10,
-                color: AppColors.primaryColor10,
-                child: AppTextWidget(
-                  'Cancel',
-                  style: AppTextStyles.body1RegularTextStyle(textColor: AppColors.dangerPrimaryColor, fontWeight: FontWeight.w400),
+              const SizedBox(height: 16),
+              InkWell(
+                onTap: () => Get.back(),
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    'Keep Ride',
+                    style: TextStyle(color: Colors.grey.shade700, fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
                 ),
-                onTap: () {
-                  Get.back();
-                },
               )
             ],
           ),

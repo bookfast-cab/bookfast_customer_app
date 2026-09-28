@@ -60,4 +60,14 @@ class AppColors {
 
   static const Color bfPrimaryColor = Color(0xff39b8e8);
   static const Color bfPrimaryColor10 = Color(0xffE7FBFE);
+
+
+
+
+
+
+  static const Color bfprimarythemeColor = Color.fromARGB(255, 21, 50, 209);
+  static const Color bfprimarythemeColor2 = Color.fromARGB(255, 21, 105, 240);
+  static const Color bfbackgroundColor = Color(0xFFF8FAFC);
+  static const Color bfCardLightBlue = Color(0xFFEDF2FA);  
 }

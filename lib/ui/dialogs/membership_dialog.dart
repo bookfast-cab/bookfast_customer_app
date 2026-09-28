@@ -84,7 +84,7 @@ class MemberShipDialog extends StatelessWidget {
                           okCallback();
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.bfPrimaryColor,
+                          backgroundColor: AppColors.bfprimarythemeColor2,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),

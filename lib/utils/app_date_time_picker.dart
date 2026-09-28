@@ -67,157 +67,257 @@ class _CustomDateTimePickerState extends State<CustomDateTimePicker> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-          top: 16,
-          left: 16,
-          right: 16,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            /// Title
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    widget.isReturn ? "Select Return Time" : "Select Pickup Time",
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            top: 12,
+            left: 20,
+            right: 20,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              /// Top Drag Handle
+              Container(
+                width: 40,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                IconButton(
-                    onPressed: () {
-                      Get.back();
-                    },
-                    icon: Icon(Icons.close_rounded))
-              ],
-            ),
+              ),
+              const SizedBox(height: 16),
 
-            const SizedBox(height: 12),
-
-            /// TODAY / TOMORROW / FUTURE
-            SizedBox(
-              height: 50,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: upcomingDates.length,
-                itemBuilder: (_, index) {
-                  DateTime date = upcomingDates[index];
-                  bool isSelected = date.day == selectedDate.day && date.month == selectedDate.month;
-
-                  String label = index == 0
-                      ? "Today"
-                      : index == 1
-                          ? "Tomorrow"
-                          : DateFormat("dd MMM").format(date);
-
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() => selectedDate = date);
-                    },
+              /// Title & Close Button
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    widget.isReturn ? "Select Return Time" : "Select Pickup Time",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () => Get.back(),
+                    borderRadius: BorderRadius.circular(20),
                     child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 6),
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: isSelected ? Colors.black : Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.grey.shade100,
+                        shape: BoxShape.circle,
                       ),
-                      child: Center(
+                      child: const Icon(Icons.close_rounded, size: 20, color: Colors.black54),
+                    ),
+                  )
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              /// TODAY / TOMORROW / FUTURE (Dates)
+              SizedBox(
+                height: 45,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: upcomingDates.length,
+                  physics: const BouncingScrollPhysics(),
+                  itemBuilder: (_, index) {
+                    DateTime date = upcomingDates[index];
+                    bool isSelected = date.day == selectedDate.day && date.month == selectedDate.month;
+
+                    String label = index == 0
+                        ? "Today"
+                        : index == 1
+                            ? "Tomorrow"
+                            : DateFormat("dd MMM").format(date);
+
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() => selectedDate = date);
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        margin: const EdgeInsets.only(right: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        decoration: BoxDecoration(
+                          color: isSelected ? AppColors.bfprimarythemeColor2 : Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(25),
+                          border: Border.all(
+                            color: isSelected ? AppColors.bfprimarythemeColor2 : Colors.grey.shade300,
+                          ),
+                          boxShadow: isSelected
+                              ? [
+                                  BoxShadow(
+                                    color: AppColors.bfprimarythemeColor2.withOpacity(0.3),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 3),
+                                  )
+                                ]
+                              : [],
+                        ),
+                        alignment: Alignment.center,
                         child: Text(
                           label,
                           style: TextStyle(
-                            color: isSelected ? Colors.white : Colors.black,
-                            fontWeight: FontWeight.w500,
+                            color: isSelected ? Colors.white : Colors.black87,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                            fontSize: 14,
                           ),
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-            ),
 
-            const SizedBox(height: 20),
+              const SizedBox(height: 32),
 
-            /// TIME PICKER
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _numberPicker(1, 12, hour, (v) => setState(() => hour = v)),
-                const Text(" : "),
-                _numberPicker(0, 59, minute, (v) => setState(() => minute = v)),
-                const SizedBox(width: 12),
-                _amPmPicker(),
-              ],
-            ),
+              /// MODERN TIME PICKER
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.grey.shade200),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _timeDropdownContainer(1, 12, hour, (v) => setState(() => hour = v)),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      child: Text(
+                        ":",
+                        style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.black54),
+                      ),
+                    ),
+                    _timeDropdownContainer(0, 59, minute, (v) => setState(() => minute = v)),
+                    const SizedBox(width: 20),
+                    _amPmDropdownContainer(),
+                  ],
+                ),
+              ),
 
-            const SizedBox(height: 20),
+              const SizedBox(height: 32),
 
-            AppButton(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              onClick: () {
-                DateTime finalDateTime = getFinalDateTime();
-                DateTime now = DateTime.now();
+              /// CONFIRM BUTTON
+              AppButton(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                onClick: () {
+                  DateTime finalDateTime = getFinalDateTime();
+                  DateTime now = DateTime.now();
 
-                if (!widget.isReturn && finalDateTime.isBefore(now)) {
-                  AppCommonWidgets.showAppToast("Sorry, time cannot be in past");
-                  return;
-                }
+                  if (!widget.isReturn && finalDateTime.isBefore(now)) {
+                    AppCommonWidgets.showAppToast("Sorry, time cannot be in the past");
+                    return;
+                  }
 
-                if (widget.isReturn &&
-                    widget.onwardDateTime != null &&
-                    finalDateTime.isBefore(
-                      widget.onwardDateTime!.add(const Duration(hours: 1)),
-                    )) {
-                  AppCommonWidgets.showAppToast("Return must be 1 hour after going");
-                  return;
-                }
+                  if (widget.isReturn &&
+                      widget.onwardDateTime != null &&
+                      finalDateTime.isBefore(
+                        widget.onwardDateTime!.add(const Duration(hours: 1)),
+                      )) {
+                    AppCommonWidgets.showAppToast("Return must be 1 hour after going");
+                    return;
+                  }
 
-                widget.onConfirm(finalDateTime);
-                Navigator.pop(context);
-              },
-              title: "Confirm",
-              bgColor: AppColors.bfPrimaryColor,
-            ),
+                  widget.onConfirm(finalDateTime);
+                  Navigator.pop(context);
+                },
+                title: "Confirm Selection",
+                bgColor: AppColors.bfprimarythemeColor2,
+              ),
 
-            const SizedBox(height: 16),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _numberPicker(int min, int max, int value, Function(int) onChanged) {
-    return SizedBox(
-      width: 60,
-      child: DropdownButton<int>(
-        value: value,
-        isExpanded: true,
-        items: List.generate(
-          max - min + 1,
-          (i) => DropdownMenuItem(
-            value: min + i,
-            child: Text(
-              (min + i).toString().padLeft(2, '0'),
-              textAlign: TextAlign.center,
-            ),
+              const SizedBox(height: 10),
+            ],
           ),
         ),
-        onChanged: (v) => onChanged(v!),
       ),
     );
   }
 
-  Widget _amPmPicker() {
-    return DropdownButton<String>(
-      value: period,
-      items: const [
-        DropdownMenuItem(value: "AM", child: Text("AM")),
-        DropdownMenuItem(value: "PM", child: Text("PM")),
-      ],
-      onChanged: (v) => setState(() => period = v!),
+  /// Styled Container for Hours and Minutes
+  Widget _timeDropdownContainer(int min, int max, int value, Function(int) onChanged) {
+    return Container(
+      width: 75,
+      height: 65,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade300),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          )
+        ],
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<int>(
+          value: value,
+          isExpanded: true,
+          icon: const SizedBox.shrink(), // Dropdown का डिफ़ॉल्ट Arrow छुपा दिया है
+          dropdownColor: Colors.white,
+          alignment: Alignment.center,
+          borderRadius: BorderRadius.circular(16),
+          style: const TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+          items: List.generate(
+            max - min + 1,
+            (i) => DropdownMenuItem(
+              value: min + i,
+              alignment: Alignment.center,
+              child: Text((min + i).toString().padLeft(2, '0')),
+            ),
+          ),
+          onChanged: (v) => onChanged(v!),
+        ),
+      ),
+    );
+  }
+
+  /// Styled Container for AM / PM
+  Widget _amPmDropdownContainer() {
+    return Container(
+      width: 70,
+      height: 65,
+      decoration: BoxDecoration(
+        color: AppColors.bfprimarythemeColor2.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.bfprimarythemeColor2.withOpacity(0.3)),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: period,
+          isExpanded: true,
+          icon: const SizedBox.shrink(),
+          dropdownColor: Colors.white,
+          alignment: Alignment.center,
+          borderRadius: BorderRadius.circular(16),
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: AppColors.bfprimarythemeColor2,
+          ),
+          items: const [
+            DropdownMenuItem(value: "AM", alignment: Alignment.center, child: Text("AM")),
+            DropdownMenuItem(value: "PM", alignment: Alignment.center, child: Text("PM")),
+          ],
+          onChanged: (v) => setState(() => period = v!),
+        ),
+      ),
     );
   }
 }

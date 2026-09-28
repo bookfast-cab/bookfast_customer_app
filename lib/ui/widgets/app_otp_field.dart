@@ -7,15 +7,17 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import '../../utils/app_colors.dart';
 
 class AppOtpField extends StatelessWidget {
-  AppOtpField({Key? key, this.onComplete, this.onChange, this.otpCount = 4}) : super(key: key);
+  AppOtpField({Key? key, this.onComplete, this.onChange, this.otpCount = 4, this.controller}) : super(key: key);
 
   Function(String)? onComplete;
   Function(String)? onChange;
   int otpCount;
+  TextEditingController? controller;
 
   @override
   Widget build(BuildContext context) {
     return PinCodeTextField(
+      controller: controller,
       hintCharacter: "",
       hintStyle: AppTextStyles.titleTextStyle(textColor: AppColors.textColor30),
       backgroundColor: Colors.transparent,

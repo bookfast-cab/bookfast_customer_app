@@ -41,8 +41,8 @@ class AppLoaderDialog {
                                     width: 35,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 3,
-                                      backgroundColor: AppColors.bfPrimaryColor.withOpacity(0.2),
-                                      color: AppColors.bfPrimaryColor,
+                                      backgroundColor: AppColors.bfprimarythemeColor2.withOpacity(0.2),
+                                      color: AppColors.bfprimarythemeColor2,
                                     ),
                                   ),
                                 ),

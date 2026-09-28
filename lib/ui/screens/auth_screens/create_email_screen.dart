@@ -1,18 +1,16 @@
+import 'dart:io';
 import 'package:bookfast_customer/ui/screens/auth_screens/enter_referral_code_screen.dart';
 import 'package:bookfast_customer/ui/widgets/app_base_screen.dart';
-import 'package:bookfast_customer/ui/widgets/app_container_widget.dart';
-import 'package:bookfast_customer/ui/widgets/app_text_widget.dart';
 import 'package:bookfast_customer/ui/widgets/common_app_bar.dart';
 import 'package:bookfast_customer/utils/app_colors.dart';
 import 'package:bookfast_customer/utils/app_images.dart';
 import 'package:bookfast_customer/utils/app_strings.dart';
-import 'package:bookfast_customer/utils/app_text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controllers/create_email_screen_contoller.dart';
 
 class CreateEmailScreen extends StatefulWidget {
-  const CreateEmailScreen({super.key,required this.editProfile});
+  const CreateEmailScreen({super.key, required this.editProfile});
   final bool editProfile;
   @override
   State<CreateEmailScreen> createState() => _CreateEmailScreenState();
@@ -25,141 +23,163 @@ class _CreateEmailScreenState extends State<CreateEmailScreen> {
   @override
   void initState() {
     _controller.editProfile.value = widget.editProfile;
-    _controller.hitGetProfile(callBack: (){});
+    _controller.hitGetProfile(callBack: () {});
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.bfPrimaryColor,
+      color: AppColors.bfbackgroundColor, // Modern soft background
       child: SafeArea(
-        left: true,
-        top: true,
-        right: true,
-        bottom: true,
         child: Scaffold(
+          backgroundColor: Colors.transparent,
           body: AppBaseScreen(
-              child: Column(
-                children: [
-                  CommonAppBar(
-                    backButtonImage: AppImages.icBackWithPadding,
-                    titleText: AppStrings.strCreateEmail,
-                    isTitleCenter: false,
-                    titleTextColor: AppColors.textColor100,
-                    onBackPress: () {
-                      Get.back();
-                    },
-                  ),
-                  Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 30),
-                        child: Form(
-                          key: _formKey,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              AppTextWidget(
-                                "What's your email?",
-                                style: AppTextStyles.headingH5TextStyle(
-                                  textColor: AppColors.textColor100,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 22,
-                                ),
+            child: Column(
+              children: [
+                CommonAppBar(
+                  backButtonImage: AppImages.icBackWithPadding,
+                  titleText: widget.editProfile ? 'Update Email' : AppStrings.strCreateEmail,
+                  isTitleCenter: false,
+                  titleTextColor: Colors.black87,
+                  backgroundColor: Colors.transparent,
+                  onBackPress: () {
+                    Get.back();
+                  },
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Header texts
+                          const Text(
+                            "What's your email?",
+                            style: TextStyle(
+                              color: Colors.black87,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 24,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            "Please enter a valid email address.\nWe’ll use this to send you important ride updates and invoices.",
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 14,
+                              height: 1.4,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 40),
+                          
+                          // Modern Text Field
+                          TextFormField(
+                            controller: _controller.emailController.value,
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.done,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black87,
+                            ),
+                            decoration: InputDecoration(
+                              hintText: 'e.g. john.doe@gmail.com',
+                              hintStyle: TextStyle(color: Colors.grey.shade400, fontWeight: FontWeight.w400),
+                              prefixIcon: const Icon(
+                                Icons.email_outlined,
+                                color: AppColors.bfprimarythemeColor2,
+                                size: 22,
                               ),
-                              const SizedBox(height: 8),
-                              AppTextWidget(
-                                "Please enter a valid email address.\nWe’ll use this to send you important updates.",
-                                style: AppTextStyles.body2RegularTextStyle(
-                                  textColor: AppColors.textColor70,
-                                  fontSize: 14,
-                                ),
+                              filled: true,
+                              fillColor: Colors.white,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide: BorderSide(color: Colors.grey.shade300),
                               ),
-                              // Align(
-                              //   alignment: Alignment.centerLeft,
-                              //   child: AppTextWidget(
-                              //     AppStrings.strEnterYourEmail,
-                              //     style: AppTextStyles.headingH7TextStyle(textColor: AppColors.textColor90, fontWeight: FontWeight.w500, fontSize: 18),
-                              //   ),
-                              // ),
-                              const SizedBox(height: 20),
-                              TextFormField(
-                                controller: _controller.emailController.value,
-                                decoration:  InputDecoration(
-                                  hintText: AppStrings.strJohnGmail,
-                                  hintStyle: const TextStyle(color: AppColors.textColor60),
-                                  enabledBorder: const UnderlineInputBorder(
-                                    borderSide: BorderSide(color: AppColors.textColor90),
-                                  ),
-                                  focusedBorder: const UnderlineInputBorder(
-                                    borderSide: BorderSide(color: AppColors.textColor90,width: 1),
-                                  ),
-                               //   prefixIcon: Icon(Icons.email)
-                                ),
-                                cursorColor: AppColors.backColor1,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter your email';
-                                  } else if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(value)) {
-                                    return 'Please enter a valid email address';
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide: BorderSide(color: Colors.grey.shade200),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide: const BorderSide(color: AppColors.bfprimarythemeColor2, width: 1.5),
+                              ),
+                              errorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide: BorderSide(color: Colors.red.shade300, width: 1.2),
+                              ),
+                              focusedErrorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide: BorderSide(color: Colors.red.shade400, width: 1.5),
+                              ),
+                            ),
+                            cursorColor: AppColors.bfprimarythemeColor2,
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Please enter your email';
+                              } else if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(value)) {
+                                return 'Please enter a valid email address';
+                              }
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 40),
+                          
+                          // Modern Submit Button
+                          InkWell(
+                            onTap: () {
+                              if (_formKey.currentState!.validate()) {
+                                // Hide keyboard
+                                FocusScope.of(context).unfocus();
+                                
+                                _controller.hitCustomerUpdateProfile(callBack: () {
+                                  if (widget.editProfile) {
+                                    Get.back();
+                                  } else {
+                                    Get.to(() => const EnterReferralCode());
                                   }
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(height: 50),
-                            /*  Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  AppContainer(
-                                    height: 60,
-                                    width: 60,
-                                    allBorderRadius: 100,
-                                    color: AppColors.bprimarycolor,
-                                    child: Image.asset(AppImages.icRightArrow,height: 25,width: 30,color: AppColors.whiteColor,),
-                                    onTap: (){
-                                      if(_formKey.currentState!.validate()) {
-                                        _controller.hitCustomerUpdateProfile(callBack: () {
-                                          if (widget.editProfile) {
-                                            //  _controller.hitGetProfile(callBack: () {
-                                            Get.back();
-                                            //  });
-                                          } else {
-                                            Get.to(const EnterReferralCode());
-                                          }
-                                         }
-                                        );
-                                      }
-                                    },
+                                });
+                              }
+                            },
+                            borderRadius: BorderRadius.circular(14),
+                            child: Container(
+                              height: 52,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: AppColors.bfprimarythemeColor2,
+                                borderRadius: BorderRadius.circular(14),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppColors.bfprimarythemeColor2.withOpacity(0.3),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 5),
                                   ),
                                 ],
-                              )*/
-                              AppContainer(
-                                height: 40,
-                                color: AppColors.bfPrimaryColor,
-                                allBorderRadius: 4,
-                                child: AppTextWidget(
-                                  'Next',
-                                  style: AppTextStyles.body2RegularTextStyle(textColor: AppColors.whiteColor, fontWeight: FontWeight.w600),
-                                ),
-                                onTap: () {
-                                  if(_formKey.currentState!.validate()) {
-                                    _controller.hitCustomerUpdateProfile(callBack: () {
-                                      if (widget.editProfile) {
-                                        Get.back();
-                                      } else {
-                                        Get.to(const EnterReferralCode());
-                                      }
-                                    }
-                                    );
-                                  }
-                                },
                               ),
-                            ],
+                              child: Text(
+                                widget.editProfile ? 'Update Email' : 'Next',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                      ))
-                ],
-              )),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
         ),
       ),
     );

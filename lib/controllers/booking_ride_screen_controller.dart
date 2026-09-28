@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:location/location.dart' as loc;
 import 'dart:io';
 import 'dart:math';
 import 'package:bookfast_customer/controllers/search_drop_location_screen_controller.dart';
@@ -95,7 +96,7 @@ class BookingRideScreenController extends GetxController {
       "image": AppImages.icHatchback,
       "vehicles": [
         {"name": "Alto", "image": AppImages.imgAlto},
-        {"name": "WagonR", "image": AppImages.imgWagonr},
+        {"name": "WagonR", "image": AppImages.imgWagonr}, 
         {"name": "Spresso", "image": AppImages.imgSpresso},
         {"name": "Celerio", "image": AppImages.imgCelerio},
       ],
@@ -158,8 +159,12 @@ class BookingRideScreenController extends GetxController {
 
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      print("Location services are disabled.");
-      return Future.error('Location services are disabled.');
+      print("Location services are disabled. Prompting native dialog.");
+      loc.Location location = loc.Location();
+      bool isTurnedOn = await location.requestService();
+      if (!isTurnedOn) {
+        return Future.error('Location services are disabled.');
+      }
     }
 
     LocationPermission permission = await Geolocator.checkPermission();

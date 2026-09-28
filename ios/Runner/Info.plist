@@ -61,5 +61,23 @@
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
+
+
+	<key>FacebookAppID</key>
+	<string>701185596303763</string>
+	<key>FacebookClientToken</key>
+	<string>853ed57ffbf875b9b4366ee7ce0bc788</string>
+	<key>FacebookDisplayName</key>
+	<string>Bookfast</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb701185596303763</string>
+			</array>
+		</dict>
+	</array>
+
 </dict>
 </plist>

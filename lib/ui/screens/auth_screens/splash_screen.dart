@@ -22,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.bfPrimaryColor,
+      color: AppColors.bfprimarythemeColor2,
       child: SafeArea(
         top: true,
         bottom: true,

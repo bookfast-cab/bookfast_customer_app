@@ -138,7 +138,7 @@ class _CommonTextFieldState extends State<AppTextFieldWidget> {
       inputFormatters: widget.isPhoneValidation! ? [FilteringTextInputFormatter.allow(RegExp("[0-9]"))] : widget.textInputFormatter,
       focusNode: widget.focusNodeValue,
       controller: widget.controller,
-      cursorColor: AppColors.bfPrimaryColor,
+      cursorColor: AppColors.bfprimarythemeColor2,
       obscureText: widget.obscure,
 
       autofocus: widget.autofocus,
@@ -228,7 +228,7 @@ class _CommonTextFieldState extends State<AppTextFieldWidget> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(widget.borderRadius),
-          borderSide: const BorderSide(color: AppColors.bfPrimaryColor, width: 1.0),
+          borderSide: const BorderSide(color: AppColors.bfprimarythemeColor2, width: 1.0),
         ),
 
 

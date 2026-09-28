@@ -52,7 +52,7 @@ class AppStrings {
   static String strCustomerSupport = 'Customer Support';
   static String strPrivacyPolicy = 'Privacy & Policy';
   static String strPickLocation = 'Pick Location';
-  static String strWelComeToBookFast = 'WelCome to Bookfast';
+  static String strWelComeToBookFast = 'Welcome to Bookfast';
   static String strEnterYourNumberToContinue = 'Enter your mobile number to continue';
   static String strSendOtp = 'SEND OTP';
   static String strEnterYourOtp = 'Enter Your OTP';

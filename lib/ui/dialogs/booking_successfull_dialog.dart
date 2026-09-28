@@ -65,7 +65,7 @@ class _BookingSuccessfullDialogState extends State<BookingSuccessfullDialog> {
                     style: AppTextStyles.headingH1TextStyle(
                       fontSize: AppDimensions.dmEighteen,
                       fontWeight: FontWeight.w600,
-                      textColor: AppColors.bfPrimaryColor,
+                      textColor: AppColors.bfprimarythemeColor2,
                     ),
                   ),
                 ),
@@ -101,7 +101,7 @@ class _BookingSuccessfullDialogState extends State<BookingSuccessfullDialog> {
                 AppButton(
                   title: "Track",
                   textColor: AppColors.whiteColor,
-                  bgColor: AppColors.bfPrimaryColor,
+                  bgColor: AppColors.bfprimarythemeColor2,
                   onClick: () {
                     widget.homeCallback();
                   },

@@ -25,7 +25,7 @@ class _ReferAndEarnScreenState extends State<ReferAndEarnScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.bfPrimaryColor,
+      color: AppColors.bfprimarythemeColor2,
       child: SafeArea(
         left: true,
         top: true,
@@ -72,7 +72,7 @@ class _ReferAndEarnScreenState extends State<ReferAndEarnScreen> {
                 AppContainer(
                   height: 45,
                   width: MediaQuery.of(context).size.width,
-                  color: AppColors.bfPrimaryColor,
+                  color: AppColors.bfprimarythemeColor2,
                   child: AppTextWidget(
                     AppStrings.strReferFriends,style: AppTextStyles.body2RegularTextStyle(textColor: AppColors.whiteColor,fontWeight: FontWeight.w600),
                   ),

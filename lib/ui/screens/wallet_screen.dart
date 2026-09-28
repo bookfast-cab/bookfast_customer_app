@@ -21,7 +21,7 @@ class _WalletScreenState extends State<WalletScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.bfPrimaryColor,
+      color: AppColors.bfprimarythemeColor2,
       child: SafeArea(
         left: true,
         top: true,
@@ -134,13 +134,13 @@ class _WalletScreenState extends State<WalletScreen> {
                   hintText: AppStrings.strEnterAmount,
                   hintStyle: const TextStyle(color: Colors.grey),
                   enabledBorder: const UnderlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.bfPrimaryColor),
+                    borderSide: BorderSide(color: AppColors.bfprimarythemeColor2),
                   ),
                   focusedBorder: const UnderlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.bfPrimaryColor),
+                    borderSide: BorderSide(color: AppColors.bfprimarythemeColor2),
                   ),
                 ),
-                cursorColor: AppColors.bfPrimaryColor,
+                cursorColor: AppColors.bfprimarythemeColor2,
               ),
             ],
           ),
@@ -158,7 +158,7 @@ class _WalletScreenState extends State<WalletScreen> {
                 Navigator.of(context).pop();
               },
 
-              child: AppTextWidget(AppStrings.strSubmit,style: AppTextStyles.body2RegularTextStyle(textColor: AppColors.bfPrimaryColor,fontSize: 14),),
+              child: AppTextWidget(AppStrings.strSubmit,style: AppTextStyles.body2RegularTextStyle(textColor: AppColors.bfprimarythemeColor2,fontSize: 14),),
             ),
           ],
         );

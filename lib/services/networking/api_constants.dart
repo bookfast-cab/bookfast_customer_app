@@ -1,13 +1,13 @@
 class ApiConstants {
 
-  // static String apiBaseUrl = "https://service.bookfast.in/";
-  // static String imageBaseUrl = "https://service.bookfast.in/customerProfilePic/";
-  // static String socketBaseUrl = "https://service.bookfast.in/customerSocket";
+  static String apiBaseUrl = "https://service.bookfast.in/";
+  static String imageBaseUrl = "https://service.bookfast.in/customerProfilePic/";
+  static String socketBaseUrl = "https://service.bookfast.in/customerSocket";
 
   // New Staging Server Api's Url
-  static String apiBaseUrl = "https://service-dev.bookfast.in/";
-  static String imageBaseUrl = "https://service-dev.bookfast.in/customerProfilePic/";
-  static String socketBaseUrl = "https://service-dev.bookfast.in/customerSocket";
+  // static String apiBaseUrl = "https://service-dev.bookfast.in/";
+  // static String imageBaseUrl = "https://service-dev.bookfast.in/customerProfilePic/";
+  // static String socketBaseUrl = "https://service-dev.bookfast.in/customerSocket";
 
 
 

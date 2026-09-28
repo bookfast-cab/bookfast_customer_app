@@ -32,7 +32,7 @@ class _EnterReferralCodeState extends State<EnterReferralCode> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.bfPrimaryColor,
+      color: AppColors.bfprimarythemeColor2,
       child: SafeArea(
         left: true,
         top: true,
@@ -117,7 +117,7 @@ class _EnterReferralCodeState extends State<EnterReferralCode> {
                           Expanded(
                             child: AppContainer(
                               height: 40,
-                              color: AppColors.bfPrimaryColor,
+                              color: AppColors.bfprimarythemeColor2,
                               allBorderRadius: 4,
                               child: AppTextWidget(
                                 'Next',

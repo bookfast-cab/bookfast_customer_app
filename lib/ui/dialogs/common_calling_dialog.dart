@@ -46,7 +46,7 @@ class CommonCallDialog extends StatelessWidget {
                 // Regular Call
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.bfPrimaryColor,
+                    backgroundColor: AppColors.bfprimarythemeColor2,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
                     minimumSize: const Size(double.infinity, 45),

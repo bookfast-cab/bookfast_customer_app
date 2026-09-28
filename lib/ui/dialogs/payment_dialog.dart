@@ -40,7 +40,7 @@ class CommonPaymentDialogWidget extends StatelessWidget {
               child: Card(
                 shape: RoundedRectangleBorder(
                   side: BorderSide(
-                    color: controller.paymentMethod.value == 0 ? AppColors.bfPrimaryColor : Colors.grey.shade300,
+                    color: controller.paymentMethod.value == 0 ? AppColors.bfprimarythemeColor2 : Colors.grey.shade300,
                     width: 1.4,
                   ),
                   borderRadius: BorderRadius.circular(12),
@@ -74,7 +74,7 @@ class CommonPaymentDialogWidget extends StatelessWidget {
               child: Card(
                 shape: RoundedRectangleBorder(
                   side: BorderSide(
-                    color: controller.paymentMethod.value == 1 ? AppColors.bfPrimaryColor : Colors.grey.shade300,
+                    color: controller.paymentMethod.value == 1 ? AppColors.bfprimarythemeColor2 : Colors.grey.shade300,
                     width: 1.4,
                   ),
                   borderRadius: BorderRadius.circular(12),

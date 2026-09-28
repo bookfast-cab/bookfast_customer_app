@@ -159,7 +159,7 @@ class _CommonSearchingDialogState extends State<CommonSearchingDialog> with Sing
               if (widget.title != null)
                 Text(
                   widget.title!.tr,
-                  style: widget.titleStyle ?? const TextStyle(fontSize: 18, color: AppColors.bfPrimaryColor),
+                  style: widget.titleStyle ?? const TextStyle(fontSize: 18, color: AppColors.bfprimarythemeColor2),
                   textAlign: TextAlign.center,
                 ),
               const SizedBox(height: 8),
@@ -171,7 +171,7 @@ class _CommonSearchingDialogState extends State<CommonSearchingDialog> with Sing
               const SizedBox(height: 20),
               AppButton(
                 title: 'Cancel',
-                bgColor: AppColors.bfPrimaryColor,
+                bgColor: AppColors.bfprimarythemeColor2,
                 onClick: () {
                   widget.onCancel();
                 },

@@ -14,6 +14,7 @@ import '../ui/screens/auth_screens/create_name_screen.dart';
 import '../ui/widgets/app_common_widgets.dart';
 import '../utils/app_functions.dart';
 import '../utils/app_strings.dart';
+import 'package:smart_auth/smart_auth.dart';
 
 class OtpScreenController extends GetxController{
   final PhoneNumberScreenController _phoneNumberScreenController = Get.put(PhoneNumberScreenController());
@@ -25,8 +26,28 @@ class OtpScreenController extends GetxController{
   var token = "".obs;
   var isNewCustomer = false.obs;
   var phoneNumberController = TextEditingController().obs;
+  
+  var otpController = TextEditingController();
+  final SmartAuth _smartAuth = SmartAuth.instance;
 
   late Timer _timer;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _listenForSms();
+  }
+
+  void _listenForSms() async {
+    final res = await _smartAuth.getSmsWithUserConsentApi();
+    if (res.hasData && res.data?.code != null) {
+      otpController.text = res.data!.code!;
+      enteredOtp.value = res.data!.code!;
+      isButtonEnabled.value = true;
+      // Auto submit OTP
+      onVerifyOtpClick();
+    }
+  }
 
   void startTimer() {
     isResendActive.value = false;
@@ -52,6 +73,8 @@ class OtpScreenController extends GetxController{
   @override
   void onClose() {
     _timer.cancel();
+    _smartAuth.removeUserConsentApiListener();
+    otpController.dispose();
     super.onClose();
   }
 

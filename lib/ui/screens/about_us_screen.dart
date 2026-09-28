@@ -20,7 +20,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.bfPrimaryColor,
+      color: AppColors.bfprimarythemeColor2,
       child: SafeArea(
         left: true,
         top: true,
@@ -55,11 +55,11 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                         const SizedBox(height: 20),
                         AppTextWidget(AppStrings.strContactDetails,style: AppTextStyles.body2RegularTextStyle(textColor: AppColors.textColor80,fontSize: 16),),
                         const SizedBox(height: 20),
-                        _contactDetails(const Icon(Icons.call,color: AppColors.bfPrimaryColor,size: 16,),AppStrings.str919084518000),
+                        _contactDetails(const Icon(Icons.call,color: AppColors.bfprimarythemeColor2,size: 16,),AppStrings.str919084518000),
                         const SizedBox(height: 20),
-                        _contactDetails(const Icon(Icons.mail,color: AppColors.bfPrimaryColor,size: 16,),'Contact@bookfast.in'),
+                        _contactDetails(const Icon(Icons.mail,color: AppColors.bfprimarythemeColor2,size: 16,),'Contact@bookfast.in'),
                         const SizedBox(height: 20),
-                        _contactDetails(const Icon(Icons.location_on,color: AppColors.bfPrimaryColor,size: 16,),AppStrings.strChandigarh),
+                        _contactDetails(const Icon(Icons.location_on,color: AppColors.bfprimarythemeColor2,size: 16,),AppStrings.strChandigarh),
                       ],
                     ),
                   ),

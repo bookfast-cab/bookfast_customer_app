@@ -24,7 +24,7 @@ class _SOSSettingScreenState extends State<SOSSettingScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.bfPrimaryColor,
+      color: AppColors.bfprimarythemeColor2,
       child: SafeArea(
         left: true,
         top: true,
@@ -61,7 +61,7 @@ class _SOSSettingScreenState extends State<SOSSettingScreen> {
                 AppContainer(
                   height: 45,
                   width: MediaQuery.of(context).size.width,
-                  color: AppColors.bfPrimaryColor,
+                  color: AppColors.bfprimarythemeColor2,
                   child: AppTextWidget(
                     AppStrings.strADD,style: AppTextStyles.body2RegularTextStyle(textColor: AppColors.whiteColor,fontWeight: FontWeight.w600),
                   ),
