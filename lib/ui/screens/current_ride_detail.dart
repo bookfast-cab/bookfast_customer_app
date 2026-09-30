@@ -1,11 +1,8 @@
 import 'package:bookfast_customer/controllers/trip_detail_screen_detail_controller.dart';
 import 'package:bookfast_customer/ui/dialogs/cancel_ride_dialog.dart';
-import 'package:bookfast_customer/ui/widgets/app_container_widget.dart';
-import 'package:bookfast_customer/ui/widgets/app_text_widget.dart';
 import 'package:bookfast_customer/utils/app_constants.dart';
 import 'package:bookfast_customer/utils/app_images.dart';
 import 'package:bookfast_customer/utils/app_network_image.dart';
-import 'package:bookfast_customer/utils/app_text_styles.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +12,8 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../handlers/session_handler/session_manager.dart';
 import '../../utils/app_colors.dart';
 import '../../utils/app_functions.dart';
+import 'package:bookfast_customer/ui/screens/app_drawer.dart';
+import 'package:share_plus/share_plus.dart';
 import 'home_map_view_screen.dart';
 
 class CurrentRideDetailScreen extends StatefulWidget {
@@ -70,422 +69,377 @@ class CurrentRideDetailScreenState extends State<CurrentRideDetailScreen> with W
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bfbackgroundColor,
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            // Top Header Bar
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  )
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      InkWell(
-                        onTap: () => Get.back(),
-                        child: const Icon(Icons.arrow_back, color: Colors.black87),
-                      ),
-                      const SizedBox(width: 16),
-                      const Text(
-                        "Trip Details",
-                        style: TextStyle(fontSize: 18, color: Colors.black87, fontWeight: FontWeight.bold),
-                      ),
-                    ],
-                  ),
-                  Obx(() {
-                    if (!_controller.isCountdownActive.value) return const SizedBox();
-                    return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.red.shade50,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.red.shade200),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.timer, color: Colors.red.shade700, size: 16),
-                          const SizedBox(width: 6),
-                          Text(
-                            '${_controller.countdownTime.value ~/ 60}:${(_controller.countdownTime.value % 60).toString().padLeft(2, '0')}',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.red.shade700,
-                            ),
-                          )
-                        ],
-                      ),
-                    );
-                  }),
-                ],
-              ),
-            ),
-            
-            // Map Section
-            Expanded(
-              child: Obx(() {
-                final position = _controller.currentPosition.value;
-                if (position == null) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                return Stack(
-                  children: [
-                    GoogleMap(
-                      onMapCreated: _controller.onMapCreated,
-                      initialCameraPosition: CameraPosition(
-                        target: LatLng(position.latitude, position.longitude),
-                        zoom: 14.0,
-                      ),
-                      gestureRecognizers: {
-                        Factory<PanGestureRecognizer>(() => PanGestureRecognizer())
-                      },
-                      markers: Set<Marker>.of(_controller.markers.values),
-                      polylines: _controller.polyline.value != null ? {_controller.polyline.value!} : {},
-                      zoomControlsEnabled: false,
-                      myLocationButtonEnabled: false,
-                    ),
-                    
-                    // Support FAB Over Map
-                    Positioned(
-                      bottom: 24,
-                      right: 16,
-                      child: FloatingActionButton(
-                        backgroundColor: Colors.white,
-                        elevation: 4,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        child: Image.asset(AppImages.icCustomerService, height: 24, color: AppColors.bfprimarythemeColor2),
-                        onPressed: () async {
-                          String? helpline = await SessionManager.getHelplineNumber();
-                          final numberToCall = helpline?.isNotEmpty == true ? helpline : "8817430000";
-                          final Uri callUri = Uri.parse("tel:$numberToCall");
-                          if (await canLaunchUrl(callUri)) {
-                            await launchUrl(callUri);
-                          }
-                        },
-                      ),
-                    ),
-                  ],
-                );
-              }),
-            ),
-
-            // Bottom Ride Detail Panel
-            Obx(() {
-              final tripDetail = _controller.tripDetail.value;
-              if (tripDetail.id == null) {
-                return Container(
-                  height: 200,
-                  color: Colors.white,
-                  child: const Center(child: CircularProgressIndicator()),
-                );
-              }
-
-              return Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
-                      blurRadius: 20,
-                      offset: const Offset(0, -5),
-                    ),
-                  ],
-                ),
-                child: SafeArea(
-                  top: false,
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Drag Handle
-                        Center(
-                          child: Container(
-                            width: 40,
-                            height: 4,
-                            margin: const EdgeInsets.only(bottom: 20),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade300,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ),
-
-                        // Status & OTP Row
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.bfprimarythemeColor2.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Text(
-                                      _getTripTypeLabel(tripDetail.tripType, tripDetail.tripSubType),
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: AppColors.bfprimarythemeColor2,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    tripDetail.driverId == null ? "Searching for a driver..." : getStatusText(tripDetail.status ?? ''),
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.black87,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  if ((tripDetail.status == AppConstants.statusAccepted || tripDetail.status == AppConstants.statusOnTheWay) && _controller.driverDuration.value.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 4.0),
-                                      child: Text(
-                                        'Arriving in ${_controller.driverDuration.value}',
-                                        style: TextStyle(fontSize: 14, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-
-                            // OTP Display
-                            if (tripDetail.status == AppConstants.statusAccepted ||
-                                tripDetail.status == AppConstants.statusOnTheWay ||
-                                tripDetail.status == AppConstants.statusArrivedToPick)
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade100,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: Colors.grey.shade300),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Text("OTP", style: TextStyle(fontSize: 11, color: Colors.grey.shade600, fontWeight: FontWeight.bold)),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      tripDetail.otp?.toString() ?? '----',
-                                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 3),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                          ],
-                        ),
-
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 16.0),
-                          child: Divider(height: 1),
-                        ),
-
-                        // Driver Info Card
-                        if (tripDetail.driver != null)
-                          Row(
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.grey.shade200, width: 2),
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(100),
-                                  child: AppNetworkImage(
-                                    imageUrl: AppFunctions.getImagePath('${tripDetail.driver?.driverProfile}'),
-                                    height: 55,
-                                    width: 55,
-                                    radius: 100,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      tripDetail.driver?.driverName ?? '',
-                                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          tripDetail.driver?.vehicleRcNo ?? '',
-                                          style: TextStyle(fontSize: 14, color: Colors.grey.shade700, fontWeight: FontWeight.w600),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Container(width: 4, height: 4, decoration: const BoxDecoration(color: Colors.grey, shape: BoxShape.circle)),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          _getVehicleTypeName(tripDetail.vehicleType),
-                                          style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              InkWell(
-                                onTap: () => _makePhoneCall(tripDetail.driver?.phoneNumber ?? ''),
-                                child: Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: Colors.green.shade50,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(Icons.call, color: Colors.green, size: 24),
-                                ),
-                              ),
-                            ],
-                          ),
-
-                        if (tripDetail.driver != null)
-                          const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 16.0),
-                            child: Divider(height: 1),
-                          ),
-
-                        // Location Timeline
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade50,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: Colors.grey.shade200),
-                          ),
-                          child: Column(
-                            children: [
-                              _buildLocationRow(
-                                icon: Icons.circle,
-                                color: AppColors.bfprimarythemeColor2,
-                                title: "Pickup",
-                                address: tripDetail.pickupAddress ?? '',
-                                isLast: false,
-                              ),
-                              _buildLocationRow(
-                                icon: Icons.square,
-                                color: Colors.red.shade400,
-                                title: "Drop-off",
-                                address: tripDetail.dropAddress ?? '',
-                                isLast: true,
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        // Schedule/Return Date Info (If Applicable)
-                        if (tripDetail.tripSubType == 2 && tripDetail.returnDateTime != null) ...[
-                          const SizedBox(height: 16),
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(12)),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.calendar_today, size: 20, color: Colors.blue),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text("Pick: ${AppFunctions.convertDateToYYYYMMDDHHMM(tripDetail.pickupDate)}", style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                                      const SizedBox(height: 4),
-                                      Text("Return: ${AppFunctions.convertDateToYYYYMMDDHHMMAsItIs(tripDetail.returnDateTime)}", style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-
-                        const SizedBox(height: 16),
-
-                        // Payment Details
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(Icons.money, color: Colors.grey.shade700, size: 22),
-                                const SizedBox(width: 8),
-                                const Text("Payment", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                                const SizedBox(width: 6),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                  decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(4)),
-                                  child: const Text("CASH", style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
-                                )
-                              ],
-                            ),
-                            Text(
-                              "₹${tripDetail.total?.toStringAsFixed(2) ?? '0'}",
-                              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 24),
-
-                        // Cancel Ride Button
-                        if (tripDetail.driverId == null || 
-                           (tripDetail.status == AppConstants.statusAccepted ||
-                            tripDetail.status == AppConstants.statusOnTheWay ||
-                            tripDetail.status == AppConstants.statusArrivedToPick))
-                          SizedBox(
-                            width: double.infinity,
-                            height: 50,
-                            child: OutlinedButton(
-                              style: OutlinedButton.styleFrom(
-                                side: BorderSide(color: Colors.red.shade300, width: 1.5),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                                foregroundColor: Colors.red,
-                              ),
-                              onPressed: () {
-                                if (tripDetail.id != null) {
-                                  showCancelRideDialog(tripDetail.id!);
-                                }
-                              },
-                              child: const Text(
-                                "Cancel Ride",
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.red),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }),
-          ],
+      drawer: const AppDrawer(),
+      backgroundColor: Colors.white, // Match map background loosely
+      appBar: AppBar(
+        backgroundColor: AppColors.bfprimarythemeColor2,
+        elevation: 0,
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu, color: Colors.white),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
         ),
+        title: Obx(() {
+          final tripDetail = _controller.tripDetail.value;
+          return Text(
+            tripDetail.driverId == null ? "Searching for a driver..." : getStatusText(tripDetail.status ?? ''),
+            style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+          );
+        }),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.phone_in_talk, color: Colors.white),
+            onPressed: () async {
+              String? helpline = await SessionManager.getHelplineNumber();
+              final numberToCall = helpline?.isNotEmpty == true ? helpline : "8817430000";
+              final Uri callUri = Uri.parse("tel:$numberToCall");
+              if (await canLaunchUrl(callUri)) {
+                await launchUrl(callUri);
+              }
+            },
+          )
+        ],
+      ),
+      body: Obx(() {
+        final position = _controller.currentPosition.value;
+        final tripDetail = _controller.tripDetail.value;
+
+        if (position == null) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        return Stack(
+          children: [
+            // ── Map Layer ──
+            Positioned.fill(
+              child: GoogleMap(
+                onMapCreated: _controller.onMapCreated,
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(position.latitude, position.longitude),
+                  zoom: 14.0,
+                ),
+                gestureRecognizers: {
+                  Factory<PanGestureRecognizer>(() => PanGestureRecognizer())
+                },
+                markers: Set<Marker>.of(_controller.markers.values),
+                polylines: _controller.polyline.value != null ? {_controller.polyline.value!} : {},
+                zoomControlsEnabled: false,
+                myLocationButtonEnabled: false,
+              ),
+            ),
+
+            // ── Blue Header Extension (Makes AppBar look taller) ──
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                height: 35,
+                color: AppColors.bfprimarythemeColor2,
+              ),
+            ),
+
+            // ── Top Driver Card (Only if driver exists) ──
+            if (tripDetail.driver != null)
+              Positioned(
+                top: 5, // Moved UP to overlap the blue extension
+                left: 0,
+                right: 0,
+                child: _buildTopDriverCard(tripDetail),
+              ),
+
+            // ── Bottom Panel ──
+            Positioned(
+              bottom: 16,
+              left: 16,
+              right: 16,
+              child: SafeArea(
+                child: _buildBottomStatsCard(tripDetail),
+              ),
+            ),
+          ],
+        );
+      }),
+    );
+  }
+
+  // --- UI Components ---
+
+  Widget _buildTopDriverCard(dynamic tripDetail) {
+    return Container(
+      // Margin removed to allow it to float higher up
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Driver Image
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.grey.shade200, width: 2),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(100),
+              child: AppNetworkImage(
+                imageUrl: AppFunctions.getImagePath('${tripDetail.driver?.driverProfile}'),
+                height: 55,
+                width: 55,
+                radius: 100,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          
+          // Driver Details
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  tripDetail.driver?.driverName ?? 'Driver',
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
+                ),
+                // const SizedBox(height: 2),
+                // Row(
+                //   children: [
+                //     const Icon(Icons.star, color: Colors.amber, size: 14),
+                //     const SizedBox(width: 4),
+                //     Text("4.8", style: TextStyle(fontSize: 12, color: Colors.grey.shade700, fontWeight: FontWeight.w600)),
+                //   ],
+                // ),
+                const SizedBox(height: 4),
+                Text(
+                  "${_getVehicleTypeName(tripDetail.vehicleType)} • ${tripDetail.driver?.vehicleRcNo ?? ''}",
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
+          ),
+          
+          // Action Buttons
+            _buildCircularActionButton(Icons.call, AppColors.bfprimarythemeColor2, () => _makePhoneCall(tripDetail.driver?.phoneNumber ?? '')),
+          // Row(
+          //   children: [
+          //     // const SizedBox(width: 12),
+          //     // _buildCircularActionButton(Icons.message, AppColors.bfprimarythemeColor2, () { /* chat action */ }),
+          //   ],
+          // )
+        ],
       ),
     );
   }
 
-  // --- UI Helper Methods ---
+  Widget _buildCircularActionButton(IconData icon, Color color, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Icon(icon, color: color, size: 20),
+      ),
+    );
+  }
+
+  Widget _buildBottomStatsCard(dynamic tripDetail) {
+    if (tripDetail.id == null || tripDetail.driver == null) {
+       // Loading or searching state
+       return Container(
+         padding: const EdgeInsets.all(20),
+         decoration: BoxDecoration(
+           color: Colors.white,
+           borderRadius: BorderRadius.circular(24),
+           boxShadow: [
+             BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 15, offset: const Offset(0, 5))
+           ],
+         ),
+         child: Column(
+           mainAxisSize: MainAxisSize.min,
+           children: [
+             const CircularProgressIndicator(),
+             const SizedBox(height: 16),
+             Text(tripDetail.id == null ? "Loading trip details..." : "Searching for a driver...", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+             const SizedBox(height: 16),
+             if (tripDetail.id != null)
+               OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: Colors.red.shade300, width: 1.5),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    foregroundColor: Colors.red,
+                  ),
+                  onPressed: () {
+                    if (tripDetail.id != null) {
+                      showCancelRideDialog(tripDetail.id!);
+                    }
+                  },
+                  child: const Text("Cancel Ride", style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+           ],
+         )
+       );
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Main Stats Row
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildStatColumn("${_controller.driverDuration.value.isEmpty ? '3' : _controller.driverDuration.value.split(' ').first} min", "away"),
+                Container(width: 1, height: 40, color: Colors.grey.shade300),
+                _buildStatColumn("${tripDetail.distance ?? '2.4'} km", "distance"),
+                Container(width: 1, height: 40, color: Colors.grey.shade300),
+                _buildStatColumn("₹${tripDetail.total?.toStringAsFixed(0) ?? '0'}", "total fare"),
+              ],
+            ),
+          ),
+          
+          const Divider(height: 1, color: Color(0xFFEEEEEE)),
+          
+          // Share Live Location
+          InkWell(
+            onTap: () {
+              final position = _controller.currentPosition.value;
+              if (position != null) {
+                final message = "Track my live location: https://www.google.com/maps/search/?api=1&query=${position.latitude},${position.longitude}";
+                Share.share(message, subject: "My Live Location");
+              }
+            },
+            child: const Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.share, color: AppColors.bfprimarythemeColor2, size: 20),
+                  SizedBox(width: 8),
+                  Text("Share Live Location", style: TextStyle(color: AppColors.bfprimarythemeColor2, fontSize: 16, fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+          ),
+
+          // Secondary Details (OTP & Cancel)
+          if (tripDetail.status == AppConstants.statusAccepted ||
+              tripDetail.status == AppConstants.statusOnTheWay ||
+              tripDetail.status == AppConstants.statusArrivedToPick) ...[
+            const Divider(height: 1, color: Color(0xFFEEEEEE)),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("OTP", style: TextStyle(fontSize: 12, color: Colors.grey.shade600, fontWeight: FontWeight.bold)),
+                      Text(tripDetail.otp?.toString() ?? '----', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, letterSpacing: 2)),
+                    ],
+                  ),
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: Colors.red.shade300, width: 1.5),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      foregroundColor: Colors.red,
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    ),
+                    onPressed: () {
+                      if (tripDetail.id != null) {
+                        showCancelRideDialog(tripDetail.id!);
+                      }
+                    },
+                    child: const Text("Cancel Ride", style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+            )
+          ],
+
+          const Divider(height: 1, color: Color(0xFFEEEEEE)),
+
+          // Location Timeline
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade50,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade200),
+              ),
+              child: Column(
+                children: [
+                  _buildLocationRow(
+                    icon: Icons.circle,
+                    color: AppColors.bfprimarythemeColor2,
+                    title: "Pickup",
+                    address: tripDetail.pickupAddress ?? '',
+                    isLast: false,
+                  ),
+                  _buildLocationRow(
+                    icon: Icons.square,
+                    color: Colors.red.shade400,
+                    title: "Drop-off",
+                    address: tripDetail.dropAddress ?? '',
+                    isLast: true,
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          ],
+      ),
+    );
+  }
+
+  Widget _buildStatColumn(String title, String subtitle) {
+    return Column(
+      children: [
+        Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Colors.black87)),
+        const SizedBox(height: 4),
+        Text(subtitle, style: TextStyle(fontSize: 12, color: Colors.grey.shade600, fontWeight: FontWeight.w500)),
+      ],
+    );
+  }
+
+  // --- Helpers ---
 
   Widget _buildLocationRow({required IconData icon, required Color color, required String title, required String address, required bool isLast}) {
     return Row(
@@ -524,12 +478,6 @@ class CurrentRideDetailScreenState extends State<CurrentRideDetailScreen> with W
     );
   }
 
-  String _getTripTypeLabel(int? tripType, int? tripSubType) {
-    String type = tripType == 1 ? "Local" : tripType == 3 ? "Outstation" : "Ride";
-    String subType = tripSubType == 1 ? "One Way" : tripSubType == 2 ? "Round Trip" : "";
-    return "$type ${subType.isNotEmpty ? '• $subType' : ''}".trim();
-  }
-
   String _getVehicleTypeName(int? type) {
     switch (type) {
       case 1: return 'Hatchback';
@@ -543,8 +491,8 @@ class CurrentRideDetailScreenState extends State<CurrentRideDetailScreen> with W
   String getStatusText(dynamic status) {
     final statusStr = status?.toString() ?? '';
     switch (statusStr) {
-      case '1': return 'Driver Accepted Ride';
-      case '7': return 'Driver is on the way';
+      case '1': return 'Driver Accepted';
+      case '7': return 'On the way';
       case '8': return 'Driver has arrived';
       case '3': return 'Ride in progress';
       default: return 'Processing...';

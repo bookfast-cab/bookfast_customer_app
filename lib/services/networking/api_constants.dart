@@ -11,9 +11,9 @@ class ApiConstants {
 
 
 
-  // static String apiBaseUrl = "http://192.168.29.153:3300/";
-  // static String imageBaseUrl = "http://192.168.29.153:3300/customerProfilePic/";
-  // static String socketBaseUrl = "http://192.168.29.153:3300/customerSocket";
+  // static String apiBaseUrl = "http://192.168.29.35:3300/";
+  // static String imageBaseUrl = "http://192.168.29.35:3300/customerProfilePic/";
+  // static String socketBaseUrl = "http://192.168.29.35:3300/customerSocket";
 
 
 
@@ -38,6 +38,7 @@ class ApiConstants {
   static String apiCustomerConfirmBooking = "${apiBaseUrl}api/customers/confirmBooking";
   static String apiCustomerGetTripCancelReasons = "${apiBaseUrl}api/customers/getTripCancelReasons";
   static String apiCustomerGetTripDetail(String tripId) {return "${apiBaseUrl}api/customers/getTripDetail?tripId=$tripId";}
+  static String apiCustomerGetTripDetailWithLatLng(String tripId,double lat,double lng) {return "${apiBaseUrl}api/customers/getTripDetail?tripId=$tripId&latitude=$lat&longitude=$lng";}
   static String apiCustomerTripHistory = "${apiBaseUrl}api/customers/getTripHistory";
   static String apiCustomerCancelTrip = "${apiBaseUrl}api/customers/cancelTrip";
   static String apiCustomerLogOut = "${apiBaseUrl}api/customers/logout";

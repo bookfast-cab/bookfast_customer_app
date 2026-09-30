@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bookfast_customer/controllers/booking_ride_screen_controller.dart';
 import 'package:bookfast_customer/controllers/my_rides_screen_controller.dart';
 import 'package:bookfast_customer/controllers/search_drop_location_screen_controller.dart';
@@ -111,8 +113,6 @@ class HomeMapViewScreenState extends State<HomeMapViewScreen> {
               children: [
                 // ── Promo Banner ──
                 _topPromoBanner(),
-                // ── Location Card ──
-                _locationCard(),
                 // ── Map (Flexible, fills middle) ──
                 Expanded(
                   child: Stack(
@@ -155,6 +155,14 @@ class HomeMapViewScreenState extends State<HomeMapViewScreen> {
                         );
                       }),
                       
+                      // ── Location Card (Overlay on Map) ──
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        child: _locationCard(),
+                      ),
+
                       // ── Support Floating Action Button (From Old UI logic) ──
                       Positioned(
                         bottom: 16,
@@ -193,65 +201,12 @@ class HomeMapViewScreenState extends State<HomeMapViewScreen> {
   }
 
   Widget _topPromoBanner() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      height: 110,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.blue.shade900, Colors.blue.shade600],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 6,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 16, top: 12, bottom: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text("FLAT",
-                      style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
-                  RichText(
-                    text: const TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "20% OFF ",
-                          style: TextStyle(color: Colors.yellow, fontSize: 26, fontWeight: FontWeight.bold, height: 1.1),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Text("on your first 3 rides!",
-                      style: TextStyle(color: Colors.white, fontSize: 11)),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.yellow,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: const Text("BOOKFAST20",
-                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 11)),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 4,
-            child: Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: Image.asset(AppImages.icSedan, fit: BoxFit.contain),
-            ),
-          ),
-        ],
-      ),
-    );
+    return Obx(() {
+      var banners = _controller.dashboardData.value?.promotionalBanners;
+
+
+      return PromoBannerSlider(banners: banners);
+    });
   }
 
   // Location card shown above the map
@@ -380,7 +335,7 @@ class HomeMapViewScreenState extends State<HomeMapViewScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text("WHERE TO?",
+                        const Text("DROP LOCATION?",
                             style: TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
                         const SizedBox(height: 3),
                         // FIXED: Listen to text changes properly
@@ -468,6 +423,14 @@ class HomeMapViewScreenState extends State<HomeMapViewScreen> {
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: [
+                  if (distance < 60)
+                  _vehicleOption('Bike', 6, Image.asset(AppImages.icBike, height: 38), "1 Seats",comingsoon:true),
+                  const SizedBox(width: 10,),
+                  
+                  if (distance < 60)
+                  _vehicleOption('Auto', 5, Image.asset(AppImages.icAuto, height: 38), "3 Seats",comingsoon:true),
+                  const SizedBox(width: 10),
+
                   if (distance < 120)
                     _vehicleOption(AppStrings.strHatchback, 1, Image.asset(AppImages.icHatchback, height: 38), "4 Seats"),
                   if (distance < 120) const SizedBox(width: 10),
@@ -512,7 +475,29 @@ class HomeMapViewScreenState extends State<HomeMapViewScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset(iconImage, height: 80, fit: BoxFit.contain),
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                AnimatedScale(
+                  scale: isSelected ? 1.15 : 1.0,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  child: Image.asset(iconImage, height: 80, fit: BoxFit.contain),
+                ),
+                if (isSelected)
+                  Positioned(
+                    top: -5,
+                    right: -10,
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child:  Icon(Icons.check_circle, color: Colors.blue.shade700, size: 22),
+                    ),
+                  ),
+              ],
+            ),
             const SizedBox(height: 6),
             Text(title,
                 style: TextStyle(
@@ -527,11 +512,16 @@ class HomeMapViewScreenState extends State<HomeMapViewScreen> {
     });
   }
 
-  Widget _vehicleOption(String title, int index, Image image, String seats) {
+  Widget _vehicleOption(String title, int index, Image image, String seats,{bool? comingsoon=false}) {
     return Obx(() {
       bool isSelected = _controller.selectedVehicleTypeIndex.value == index;
       return GestureDetector(
         onTap: () {
+          if(comingsoon == true) {
+            AppCommonWidgets.showAppToast("coming soon...");
+            return;
+          };
+
           _controller.selectVehicleType(index);
           // Old UI behavior logic when selecting vehicle type
           if (_searchDropLocationController.dropAddressController.value.text.isNotEmpty) {
@@ -545,32 +535,59 @@ class HomeMapViewScreenState extends State<HomeMapViewScreen> {
             });
           }
         },
-        child: Container(
-          width: 110,
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isSelected ? Colors.blue.shade700 : Colors.grey.shade300,
-              width: isSelected ? 2 : 1,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              width: 110,
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+              decoration: BoxDecoration(
+                color: (comingsoon == true)?Colors.grey.shade200:Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isSelected ? Colors.blue.shade700 : Colors.grey.shade300,
+                  width: isSelected ? 2 : 1,
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(title,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: isSelected ? Colors.blue.shade700 : Colors.black87,
+                      )),
+                  const SizedBox(height: 8),
+                  Opacity(opacity: comingsoon == true ? 0.5 : 1.0, child: image),
+                  const SizedBox(height: 6),
+                  Text(seats, style: const TextStyle(fontSize: 10, color: Colors.grey)),
+                ],
+              ),
             ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(title,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: isSelected ? Colors.blue.shade700 : Colors.black87,
-                  )),
-              const SizedBox(height: 8),
-              image,
-              const SizedBox(height: 6),
-              Text(seats, style: const TextStyle(fontSize: 10, color: Colors.grey)),
-            ],
-          ),
+            if (comingsoon == true)
+              Positioned(
+                bottom: 8,
+                right: 20,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: Colors.redAccent,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 2,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: const Text("Coming Soon", 
+                    style: TextStyle(fontSize: 8, color: Colors.white, fontWeight: FontWeight.bold)
+                  ),
+                ),
+              ),
+          ],
         ),
       );
     });
@@ -1205,6 +1222,126 @@ class DottedBorderLine extends StatelessWidget {
           height: 1.5,
         ),
       )),
+    );
+  }
+}
+class PromoBannerSlider extends StatefulWidget {
+  final List<dynamic>? banners;
+  const PromoBannerSlider({super.key, this.banners});
+
+  @override
+  State<PromoBannerSlider> createState() => _PromoBannerSliderState();
+}
+
+class _PromoBannerSliderState extends State<PromoBannerSlider> {
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    if (widget.banners == null || widget.banners!.isEmpty) return;
+    _timer = Timer.periodic(const Duration(seconds: 7), (Timer timer) {
+      if (_currentPage < widget.banners!.length - 1) {
+        _currentPage++;
+      } else {
+        _currentPage = 0;
+      }
+
+      if (_pageController.hasClients) {
+        _pageController.animateToPage(
+          _currentPage,
+          duration: const Duration(milliseconds: 350),
+          curve: Curves.easeIn,
+        );
+      }
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant PromoBannerSlider oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.banners?.length != widget.banners?.length) {
+      _startTimer();
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.banners == null || widget.banners!.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          height: 120, // slightly larger to accommodate margin
+          child: PageView(
+            controller: _pageController,
+            onPageChanged: (int page) {
+              setState(() {
+                _currentPage = page;
+              });
+            },
+            children: widget.banners!.map((banner) {
+              return _buildDynamicBanner(banner);
+            }).toList(),
+          ),
+        ),
+        const SizedBox(height: 2),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(widget.banners!.length, (index) {
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              width: _currentPage == index ? 16 : 8,
+              height: 4,
+              decoration: BoxDecoration(
+                color: _currentPage == index ? Colors.blue.shade700 : Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            );
+          }),
+        ),
+        const SizedBox(height: 4),
+      ],
+    );
+  }
+
+  Widget _buildDynamicBanner(dynamic banner) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        image: DecorationImage(
+          image: NetworkImage(banner.imageUrl ?? ""),
+          fit: BoxFit.fill,
+        )
+      ),
+      child: GestureDetector(
+        onTap: () async {
+          if (banner.link != null && banner.link!.isNotEmpty) {
+            final Uri url = Uri.parse(banner.link!);
+            if (await canLaunchUrl(url)) {
+              await launchUrl(url);
+            }
+          }
+        },
+      )
     );
   }
 }

@@ -34,16 +34,45 @@ class DashboardModel {
   };
 }
 
+
+class PromotionalBannerData {
+  int? id;
+  String? title;
+  String? imageUrl;
+  String? type;
+  String? link;
+
+  PromotionalBannerData({this.id, this.title, this.imageUrl, this.type, this.link});
+
+  factory PromotionalBannerData.fromJson(Map<String, dynamic> json) => PromotionalBannerData(
+    id: json["id"],
+    title: json["title"],
+    imageUrl: json["image_url"],
+    type: json["type"],
+    link: json["link"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "title": title,
+    "image_url": imageUrl,
+    "type": type,
+    "link": link,
+  };
+}
+
 class DashBoardData {
   AppUpdate? appUpdate;
   ActiveTrip? activeTrip;
   String? helplineNumber;
   List<NearbyDriver>? nearbyDrivers;
+  List<PromotionalBannerData>? promotionalBanners;
   DashBoardData({
     this.appUpdate,
     this.activeTrip,
     this.helplineNumber,
-    this.nearbyDrivers
+    this.nearbyDrivers,
+    this.promotionalBanners
   });
 
   factory DashBoardData.fromJson(Map<String, dynamic> json) => DashBoardData(
@@ -51,6 +80,7 @@ class DashBoardData {
     activeTrip: json["activeTrip"] == null ? null : ActiveTrip.fromJson(json["activeTrip"]),
     helplineNumber: json["helpline_number"],
     nearbyDrivers: json["nearbyDrivers"] == null ? [] : List<NearbyDriver>.from(json["nearbyDrivers"]!.map((x) => NearbyDriver.fromJson(x))),
+    promotionalBanners: json["promotionalBanners"] == null ? [] : List<PromotionalBannerData>.from(json["promotionalBanners"]!.map((x) => PromotionalBannerData.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {
@@ -58,6 +88,7 @@ class DashBoardData {
     "activeTrip": activeTrip?.toJson(),
     "helpline_number": helplineNumber,
     "nearbyDrivers": nearbyDrivers == null ? [] : List<dynamic>.from(nearbyDrivers!.map((x) => x.toJson())),
+    "promotionalBanners": promotionalBanners == null ? [] : List<dynamic>.from(promotionalBanners!.map((x) => x.toJson())),
   };
 }
 

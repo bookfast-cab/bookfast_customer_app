@@ -62,7 +62,7 @@ class _SearchDropLocationScreenState extends State<SearchDropLocationScreen> {
   Widget build(BuildContext context) {
     return AppBaseScreen(
       child: Container(
-        color: AppColors.bfbackgroundColor, 
+        color: AppColors.bfbackgroundColor, // Modern soft background
         child: Column(
           children: [
             CommonAppBar(

@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'package:location/location.dart' as loc;
 import 'dart:io';
 import 'dart:math';
+import 'dart:ui' as ui;
+import 'dart:typed_data';
+import 'package:flutter/services.dart';
 import 'package:bookfast_customer/controllers/search_drop_location_screen_controller.dart';
 import 'package:bookfast_customer/models/booking_ride_model.dart';
 import 'package:bookfast_customer/models/coupon_list_model.dart';
@@ -60,11 +63,16 @@ class BookingRideScreenController extends GetxController {
   RxSet<Marker> driverMarkers = <Marker>{}.obs;
   late BitmapDescriptor driverIcon;
 
+  Future<Uint8List> _getBytesFromAsset(String path, int width) async {
+    ByteData data = await rootBundle.load(path);
+    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetWidth: width);
+    ui.FrameInfo fi = await codec.getNextFrame();
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
+  }
+
   Future<void> loadDrCustomMarkers() async {
-    driverIcon = await BitmapDescriptor.fromAssetImage(
-      const ImageConfiguration(devicePixelRatio: 2.5),
-      AppImages.icMapCarSmall,
-    );
+    final Uint8List markerIcon = await _getBytesFromAsset(AppImages.icMapCar, 80); 
+    driverIcon = BitmapDescriptor.fromBytes(markerIcon);
     isDriverIconLoaded = true;
   }
 
@@ -113,7 +121,7 @@ class BookingRideScreenController extends GetxController {
     },
     3: {
       "title": "SUV",
-      "image": AppImages.icSUV,
+      "image": AppImages.icSuv,
       "vehicles": [
         {"name": "Ertiga", "image": AppImages.imgErtiga},
         {"name": "Marazzo", "image": AppImages.imgMrazzo},
@@ -139,6 +147,19 @@ class BookingRideScreenController extends GetxController {
   void onMapCreated(GoogleMapController controller) {
     mapController = controller;
     isMapReady = true;
+    if (currentPosition.value != null) {
+      Future.delayed(const Duration(milliseconds: 300), () {
+        mapController?.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: LatLng(
+                  currentPosition.value!.latitude, currentPosition.value!.longitude),
+              zoom: 14.0,
+            ),
+          ),
+        );
+      });
+    }
   }
 
   late BitmapDescriptor customerIcon;

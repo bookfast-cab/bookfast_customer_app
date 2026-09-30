@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ui' as ui;
+import 'dart:typed_data';
+import 'package:flutter/services.dart';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:bookfast_customer/models/trip_detail_model.dart';
@@ -251,12 +254,14 @@ class TripDetailController extends GetxController {
   }
 
   onDisposeCall() {
-    _appSocketHandler.socket.off('driverLocationUpdate');
-    _appSocketHandler.socket.off('rideStarted');
-    _appSocketHandler.socket.off('tripCancelled');
-    _appSocketHandler.socket.off('rideCompleted');
-    _appSocketHandler.socket.off('driverOnTheWay');
-    _appSocketHandler.socket.off('driverArrived');
+    if (_appSocketHandler.isInitialized) {
+      _appSocketHandler.socket.off('driverLocationUpdate');
+      _appSocketHandler.socket.off('rideStarted');
+      _appSocketHandler.socket.off('tripCancelled');
+      _appSocketHandler.socket.off('rideCompleted');
+      _appSocketHandler.socket.off('driverOnTheWay');
+      _appSocketHandler.socket.off('driverArrived');
+    }
     stopTickSound();
   }
 
@@ -397,7 +402,7 @@ class TripDetailController extends GetxController {
       AppCommonWidgets.showAppToast(AppStrings.strNoInternet);
       return;
     }
-    var response = await ApiHandler().get(endPoint: ApiConstants.apiCustomerGetTripDetail(tripId), addAuthorization: true, showLoader: false);
+    var response = await ApiHandler().get(endPoint: ApiConstants.apiCustomerGetTripDetailWithLatLng(tripId,currentPosition.value?.latitude??0.0,currentPosition.value?.longitude??0.0), addAuthorization: true, showLoader: false);
     TripDetailModel model = TripDetailModel.fromJson(response);
     if ((model.success ?? 0) == 1) {
       if (model.data != null) {
@@ -437,9 +442,17 @@ class TripDetailController extends GetxController {
     }
   }
 
+  Future<Uint8List> _getBytesFromAsset(String path, int width) async {
+    ByteData data = await rootBundle.load(path);
+    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetWidth: width);
+    ui.FrameInfo fi = await codec.getNextFrame();
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
+  }
+
   Future<void> setCustomMarkersIcon() async {
     try {
-      driverIcon = await BitmapDescriptor.asset(ImageConfiguration(devicePixelRatio: 1), AppImages.icMapCarSmall,);
+      final Uint8List markerIcon = await _getBytesFromAsset(AppImages.icMapCar, 80);
+      driverIcon = BitmapDescriptor.fromBytes(markerIcon);
 
       pickupIcon = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen);
       destinationIcon = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
@@ -477,6 +490,20 @@ class TripDetailController extends GetxController {
         );
       }
 
+      if (tripDetail.value.driverId == null && tripDetail.value.nearbyDrivers != null) {
+        for (var driver in tripDetail.value.nearbyDrivers!) {
+          if (driver.latitude != null && driver.longitude != null) {
+            markers[MarkerId('nearby_driver_${driver.id}')] = Marker(
+              markerId: MarkerId('nearby_driver_${driver.id}'),
+              icon: driverIcon,
+              position: LatLng(driver.latitude!, driver.longitude!),
+              rotation: 0,
+            );
+          }
+        }
+      }
+
+      markers.refresh();
       update();
     } catch (e) {
       print("Error setting custom markers: $e");

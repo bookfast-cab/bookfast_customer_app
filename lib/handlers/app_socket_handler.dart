@@ -8,7 +8,8 @@ import '../utils/app_functions.dart';
 
 class AppSocketHandler {
   var searchingMessage = "Finding a driver...";
-  late socket_io.Socket socket ;
+  late socket_io.Socket socket;
+  bool isInitialized = false;
 
   Future<bool> init({Function? onConnect}) async {
 
@@ -23,6 +24,7 @@ class AppSocketHandler {
         .disableAutoConnect() // disable auto-connection
         .setExtraHeaders({"authorization":token})
         .build());
+    isInitialized = true;
     socket.connect();
     socket.onConnect((data) {
       if (onConnect != null) {

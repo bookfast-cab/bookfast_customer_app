@@ -3,6 +3,7 @@
 //     final tripDetailModel = tripDetailModelFromJson(jsonString);
 
 import 'dart:convert';
+import 'package:bookfast_customer/models/dashboard_model.dart';
 
 TripDetailModel tripDetailModelFromJson(String str) => TripDetailModel.fromJson(json.decode(str));
 
@@ -101,6 +102,7 @@ class TripDetailData {
   int? remainingAmountFromDriver;
   int? createdbyadmin;
   DriverData? driver;
+  List<NearbyDriver>? nearbyDrivers;
 
   TripDetailData({
     this.id,
@@ -171,6 +173,7 @@ class TripDetailData {
     this.remainingAmountFromDriver,
     this.createdbyadmin,
     this.driver,
+    this.nearbyDrivers,
   });
 
   factory TripDetailData.fromJson(Map<String, dynamic> json) => TripDetailData(
@@ -243,6 +246,7 @@ class TripDetailData {
     remainingAmountFromDriver: (json["remainingAmountFromDriver"] as num?)?.toInt(),
     createdbyadmin: json["createdbyadmin"],
     driver: json["driver"] == null ? null : DriverData.fromJson(json["driver"]),
+    nearbyDrivers: json["nearbyDrivers"] == null ? [] : List<NearbyDriver>.from(json["nearbyDrivers"]!.map((x) => NearbyDriver.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {
@@ -315,6 +319,7 @@ class TripDetailData {
     "remainingAmountFromDriver": remainingAmountFromDriver,
     "createdbyadmin": createdbyadmin,
     "driver": driver?.toJson(),
+    "nearbyDrivers": nearbyDrivers == null ? [] : List<dynamic>.from(nearbyDrivers!.map((x) => x.toJson())),
   };
 }
 class PaymentDetail {

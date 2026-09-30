@@ -87,7 +87,7 @@ class ApiHandler {
 
       CommonWidgets.snackBar(ex.toString(), isError: true);
 
-      throw "";
+      return {"success": 0, "message": "Something went wrong"};
 
       // var model = checkDioError(ex);
       // return model;
@@ -106,7 +106,7 @@ class ApiHandler {
         if (error.response != null) {
           if (error.response!.statusCode == 401 || error.response!.statusCode == 403) {
             showSessionExpiredDialog();
-            throw "";
+            return {"success": 0, "message": "Something went wrong"};
           } else if (error.response!.statusCode == 400 || error.response!.statusCode == 404 || error.response!.statusCode == 500) {
             if (error.response!.data != null) {
               return error.response!.data;
@@ -119,7 +119,7 @@ class ApiHandler {
         CommonWidgets.snackBar("Something went wrong. Please check your internet connection.", isError: true);
         // CommonWidgets.snackBar("$endPoint\n" + error.toString(), isError: true);
       }
-      throw "";
+      return {"success": 0, "message": "Something went wrong"};
 
       // var model = ApiErrorModel.fromJson((error as dynamic).response.data);
       // return model;
@@ -182,7 +182,7 @@ class ApiHandler {
 
       CommonWidgets.snackBar(ex.toString(), isError: true);
 
-      throw "";
+      return {"success": 0, "message": "Something went wrong"};
 
       // var model = checkDioError(ex);
       // return model;
@@ -201,7 +201,7 @@ class ApiHandler {
         if (error.response != null) {
           if (error.response!.statusCode == 401 || error.response!.statusCode == 403) {
             showSessionExpiredDialog();
-            throw "";
+            return {"success": 0, "message": "Something went wrong"};
           } else if (error.response!.statusCode == 400 || error.response!.statusCode == 404 || error.response!.statusCode == 500) {
             if (error.response!.data != null) {
               return error.response!.data;
@@ -214,7 +214,7 @@ class ApiHandler {
 
         // CommonWidgets.snackBar("$endPoint\n" + error.toString(), isError: true);
       }
-      throw "";
+      return {"success": 0, "message": "Something went wrong"};
 
       // var model = ApiErrorModel.fromJson((error as dynamic).response.data);
       // return model;
@@ -276,7 +276,7 @@ class ApiHandler {
 
       CommonWidgets.snackBar(ex.toString(), isError: true);
 
-      throw "";
+      return {"success": 0, "message": "Something went wrong"};
 
       // var model = checkDioError(ex);
       // return model;
@@ -295,7 +295,7 @@ class ApiHandler {
         if (error.response != null) {
           if (error.response!.statusCode == 401 || error.response!.statusCode == 403) {
             showSessionExpiredDialog();
-            throw "";
+            return {"success": 0, "message": "Something went wrong"};
           } else if (error.response!.statusCode == 400 || error.response!.statusCode == 404 || error.response!.statusCode == 500) {
             if (error.response!.data != null) {
               return error.response!.data;
@@ -308,7 +308,7 @@ class ApiHandler {
 
         // CommonWidgets.snackBar("$endPoint\n" + error.toString(), isError: true);
       }
-      throw "";
+      return {"success": 0, "message": "Something went wrong"};
 
       // var model = ApiErrorModel.fromJson((error as dynamic).response.data);
       // return model;
@@ -363,7 +363,7 @@ class ApiHandler {
       }
       CommonWidgets.snackBar(ex.toString(), isError: true);
 
-      throw "";
+      return {"success": 0, "message": "Something went wrong"};
 
       // var model = checkDioError(ex);
       // return model;
@@ -382,7 +382,7 @@ class ApiHandler {
         if (error.response != null) {
           if (error.response!.statusCode == 401 || error.response!.statusCode == 403) {
             showSessionExpiredDialog();
-            throw "";
+            return {"success": 0, "message": "Something went wrong"};
           } else if (error.response!.statusCode == 400 || error.response!.statusCode == 404 || error.response!.statusCode == 500) {
             if (error.response!.data != null) {
               return error.response!.data;
@@ -396,7 +396,7 @@ class ApiHandler {
 
         // CommonWidgets.snackBar("$endPoint\n" + error.toString(), isError: true);
       }
-      throw "";
+      return {"success": 0, "message": "Something went wrong"};
 
       // var model = ApiErrorModel.fromJson((error as dynamic).response.data);
       // return model;
@@ -455,7 +455,7 @@ class ApiHandler {
 
       CommonWidgets.snackBar(ex.toString(), isError: true);
 
-      throw "";
+      return {"success": 0, "message": "Something went wrong"};
 
       // var model = checkDioError(ex);
       // return model;
@@ -474,7 +474,7 @@ class ApiHandler {
         if (error.response != null) {
           if (error.response!.statusCode == 401 || error.response!.statusCode == 403) {
             showSessionExpiredDialog();
-            throw "";
+            return {"success": 0, "message": "Something went wrong"};
           } else if (error.response!.statusCode == 400 || error.response!.statusCode == 404 || error.response!.statusCode == 500) {
             if (error.response!.data != null) {
               return error.response!.data;
@@ -487,7 +487,7 @@ class ApiHandler {
         CommonWidgets.snackBar("Something went wrong. Please check your internet connection.", isError: true);
         // CommonWidgets.snackBar("$endPoint\n" + error.toString(), isError: true);
       }
-      throw "";
+      return {"success": 0, "message": "Something went wrong"};
 
       // var model = ApiErrorModel.fromJson((error as dynamic).response.data);
       // return model;
@@ -542,7 +542,7 @@ class ApiHandler {
         if (error.response != null) {
           if (error.response!.statusCode == 401 || error.response!.statusCode == 403) {
             showSessionExpiredDialog();
-            throw "";
+            return {"success": 0, "message": "Something went wrong"};
           } else if (error.response!.statusCode == 400 || error.response!.statusCode == 404 || error.response!.statusCode == 500) {
             if (error.response!.data != null) {
               return error.response!.data;
@@ -554,7 +554,7 @@ class ApiHandler {
       if (showErrorMessage) {
         CommonWidgets.snackBar("Something went wrong. Please check your internet connection.", isError: true);
       }
-      throw "";
+      return {"success": 0, "message": "Something went wrong"};
     }
   }
 

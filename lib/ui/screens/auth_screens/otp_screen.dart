@@ -128,6 +128,8 @@ class OtpScreenState extends State<OtpScreen> {
                             onComplete: (v) {
                               _controller.isButtonEnabled.refresh();
                               _controller.enteredOtp.value = v;
+                              FocusScope.of(context).unfocus();
+                              _controller.onVerifyOtpClick();
                             },
                           ),
                           const SizedBox(height: 32),
