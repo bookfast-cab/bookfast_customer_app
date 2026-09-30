@@ -64,11 +64,11 @@
 
 
 	<key>FacebookAppID</key>
-	<string>701185596303763</string>
+	<string>YOUR_APP_ID_HERE</string>
 	<key>FacebookClientToken</key>
-	<string>853ed57ffbf875b9b4366ee7ce0bc788</string>
+	<string>YOUR_CLIENT_TOKEN_HERE</string>
 	<key>FacebookDisplayName</key>
-	<string>Bookfast</string>
+	<string>Aapke App Ka Naam</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
